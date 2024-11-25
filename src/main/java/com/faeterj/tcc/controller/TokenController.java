@@ -1,6 +1,7 @@
 package com.faeterj.tcc.controller;
 
 import java.time.Instant;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.faeterj.tcc.dto.LoginRequest;
@@ -66,8 +68,74 @@ public class TokenController {
         
         var jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
 
-        return ResponseEntity.ok(new LoginResponse(jwtValue, expiresIn));
+        // Gerar um novo Refresh token
+        var novoHorarioRefreshToken = Instant.now();
+        var expiresInRefreshToken = 1296000L;
+
+        var scopesRefreshToken = user.get().getRoles()
+                        .stream()
+                        .map(Role::getName)
+                        .collect(Collectors.joining(" "));
+
+        var claimsRefreshToken = JwtClaimsSet.builder()
+                            .issuer("mybackend")
+                            .subject(user.get().getUserID().toString())
+                            .issuedAt(novoHorarioRefreshToken)
+                            .expiresAt(novoHorarioRefreshToken.plusSeconds(expiresInRefreshToken))
+                            .claim("scope", scopesRefreshToken)
+                            .build();
+
+        var refreshTokenRetornado = jwtEncoder.encode(JwtEncoderParameters.from(claimsRefreshToken)).getTokenValue();
+
+        return ResponseEntity.ok(new LoginResponse(jwtValue, expiresIn, refreshTokenRetornado));
     }
     
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponse> refreshToken(JwtAuthenticationToken refreshTokenRecebido) {
+        // Validar o refresh token e obter o userId associado
+        //var userId = tokenService.validateRefreshToken(refreshToken);
+        var user = userRepository.findById(UUID.fromString(refreshTokenRecebido.getName()))
+                                .orElseThrow(() -> new BadCredentialsException("Usuário não encontrado"));
+
+        // Gerar um novo access token
+        var novoHorario = Instant.now();
+        var expiresIn = 900L;
+
+        var scopes = user.getRoles()
+                        .stream()
+                        .map(Role::getName)
+                        .collect(Collectors.joining(" "));
+
+        var claims = JwtClaimsSet.builder()
+                            .issuer("mybackend")
+                            .subject(user.getUserID().toString())
+                            .issuedAt(novoHorario)
+                            .expiresAt(novoHorario.plusSeconds(expiresIn))
+                            .claim("scope", scopes)
+                            .build();
+
+        var jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+
+        // Gerar um novo Refresh token
+        var novoHorarioRefreshToken = Instant.now();
+        var expiresInRefreshToken = 1296000L;
+
+        var scopesRefreshToken = user.getRoles()
+                        .stream()
+                        .map(Role::getName)
+                        .collect(Collectors.joining(" "));
+
+        var claimsRefreshToken = JwtClaimsSet.builder()
+                            .issuer("mybackend")
+                            .subject(user.getUserID().toString())
+                            .issuedAt(novoHorarioRefreshToken)
+                            .expiresAt(novoHorarioRefreshToken.plusSeconds(expiresInRefreshToken))
+                            .claim("scope", scopesRefreshToken)
+                            .build();
+
+        var refreshTokenRetornado = jwtEncoder.encode(JwtEncoderParameters.from(claimsRefreshToken)).getTokenValue();
+
+        return ResponseEntity.ok(new LoginResponse(jwtValue, expiresIn, refreshTokenRetornado));
+    }
 
 }
