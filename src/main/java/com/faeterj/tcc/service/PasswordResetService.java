@@ -32,9 +32,17 @@ public class PasswordResetService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
 
-        // Gerar o token
+        PasswordResetToken resetToken = tokenRepository.findByUserUserID(user.getUserID());
+        
+        //caso o usuário já tenha um token de recuperação, exclua o antigo
+        if (resetToken != null)
+        {
+            tokenRepository.delete(resetToken);
+        }
+
+        // Gerar um token novo
         String token = UUID.randomUUID().toString();
-        PasswordResetToken resetToken = new PasswordResetToken();
+        resetToken = new PasswordResetToken();
         resetToken.setToken(token);
         resetToken.setUser(user);
         resetToken.setExpiryDate(LocalDateTime.now().plusHours(1)); // Expira em 1 hora

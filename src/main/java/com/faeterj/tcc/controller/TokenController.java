@@ -1,141 +1,65 @@
 package com.faeterj.tcc.controller;
 
-import java.time.Instant;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.faeterj.tcc.dto.LoginRequest;
 import com.faeterj.tcc.dto.LoginResponse;
-import com.faeterj.tcc.model.Role;
-import com.faeterj.tcc.repository.UserRepository;
-
+import com.faeterj.tcc.service.TokenService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class TokenController {
 
-    private final JwtEncoder jwtEncoder;
+    private final TokenService tokenService;
 
-    private final UserRepository userRepository;
-
-    private BCryptPasswordEncoder passwordEncoder; //senha encriptada
-
-
-    public TokenController(JwtEncoder jwtEncoder, UserRepository userRepository,
-            BCryptPasswordEncoder passwordEncoder) {
-        this.jwtEncoder = jwtEncoder;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
+    public TokenController(TokenService tokenService) {
+        this.tokenService = tokenService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) { //estou recebendo o login limpo (username OU email e senha limpa)
-        
-        //var user = userRepository.findByUsername(loginRequest.usernameOrEmail());
-        var user = loginRequest.usernameOrEmail().contains("@") ? userRepository.findByEmail(loginRequest.usernameOrEmail()) : userRepository.findByUsername(loginRequest.usernameOrEmail());
-
-        if(user.isEmpty() || !user.get().isLoginCorrect(loginRequest, passwordEncoder))
-        {
-            throw new BadCredentialsException("usuario ou senha é invalida");
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+        try {
+            LoginResponse response = tokenService.authenticate(loginRequest);
+            return ResponseEntity.ok(response); // Retorna 200 OK
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new LoginResponse(null, null, null)); // Retorna 401 Unauthorized
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new LoginResponse(null, null, null)); // Retorna 400 Bad Request
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new LoginResponse(null, null, null)); // Retorna 500 Internal Server Error
         }
-
-        var novoHorario = Instant.now();
-        var expiresIn = 900L;
-
-        var scopes = user.get().getRoles()
-                        .stream()
-                        .map(Role::getName)
-                        .collect(Collectors.joining(""));
-
-        var claims = JwtClaimsSet.builder()
-                        .issuer("mybackend")
-                        .subject(user.get().getUserID().toString())
-                        .issuedAt(novoHorario)
-                        .expiresAt(novoHorario.plusSeconds(expiresIn))
-                        .claim("scope", scopes)
-                        .build();
-        
-        var jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-
-        // Gerar um novo Refresh token
-        var novoHorarioRefreshToken = Instant.now();
-        var expiresInRefreshToken = 1296000L;
-
-        var scopesRefreshToken = user.get().getRoles()
-                        .stream()
-                        .map(Role::getName)
-                        .collect(Collectors.joining(" "));
-
-        var claimsRefreshToken = JwtClaimsSet.builder()
-                            .issuer("mybackend")
-                            .subject(user.get().getUserID().toString())
-                            .issuedAt(novoHorarioRefreshToken)
-                            .expiresAt(novoHorarioRefreshToken.plusSeconds(expiresInRefreshToken))
-                            .claim("scope", scopesRefreshToken)
-                            .build();
-
-        var refreshTokenRetornado = jwtEncoder.encode(JwtEncoderParameters.from(claimsRefreshToken)).getTokenValue();
-
-        return ResponseEntity.ok(new LoginResponse(jwtValue, expiresIn, refreshTokenRetornado));
     }
-    
+
     @PostMapping("/refresh")
     public ResponseEntity<LoginResponse> refreshToken(JwtAuthenticationToken refreshTokenRecebido) {
-        // Validar o refresh token e obter o userId associado
-        //var userId = tokenService.validateRefreshToken(refreshToken);
-        var user = userRepository.findById(UUID.fromString(refreshTokenRecebido.getName()))
-                                .orElseThrow(() -> new BadCredentialsException("Usuário não encontrado"));
-
-        // Gerar um novo access token
-        var novoHorario = Instant.now();
-        var expiresIn = 900L;
-
-        var scopes = user.getRoles()
-                        .stream()
-                        .map(Role::getName)
-                        .collect(Collectors.joining(" "));
-
-        var claims = JwtClaimsSet.builder()
-                            .issuer("mybackend")
-                            .subject(user.getUserID().toString())
-                            .issuedAt(novoHorario)
-                            .expiresAt(novoHorario.plusSeconds(expiresIn))
-                            .claim("scope", scopes)
-                            .build();
-
-        var jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-
-        // Gerar um novo Refresh token
-        var novoHorarioRefreshToken = Instant.now();
-        var expiresInRefreshToken = 1296000L;
-
-        var scopesRefreshToken = user.getRoles()
-                        .stream()
-                        .map(Role::getName)
-                        .collect(Collectors.joining(" "));
-
-        var claimsRefreshToken = JwtClaimsSet.builder()
-                            .issuer("mybackend")
-                            .subject(user.getUserID().toString())
-                            .issuedAt(novoHorarioRefreshToken)
-                            .expiresAt(novoHorarioRefreshToken.plusSeconds(expiresInRefreshToken))
-                            .claim("scope", scopesRefreshToken)
-                            .build();
-
-        var refreshTokenRetornado = jwtEncoder.encode(JwtEncoderParameters.from(claimsRefreshToken)).getTokenValue();
-
-        return ResponseEntity.ok(new LoginResponse(jwtValue, expiresIn, refreshTokenRetornado));
+        try {
+            LoginResponse response = tokenService.refreshToken(refreshTokenRecebido);
+            return ResponseEntity.ok(response); // Retorna 200 OK
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new LoginResponse(null, null, null)); // Retorna 401 Unauthorized
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new LoginResponse(null, null, null)); // Retorna 500 Internal Server Error
+        }
     }
 
+    // Manipulação de exceções para fornecer respostas detalhadas
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<String> handleBadCredentials(BadCredentialsException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário ou senha inválidos.");
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGenericException(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro inesperado: " + ex.getMessage());
+    }
 }

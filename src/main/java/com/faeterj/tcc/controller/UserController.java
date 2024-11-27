@@ -1,93 +1,60 @@
 package com.faeterj.tcc.controller;
 
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
-
 import com.faeterj.tcc.dto.CreateUserDTO;
-import com.faeterj.tcc.model.Paciente;
-import com.faeterj.tcc.model.Role;
+import com.faeterj.tcc.dto.EsqueciMinhaSenhaDTO;
+import com.faeterj.tcc.dto.RequestResponseDTO;
 import com.faeterj.tcc.model.User;
-import com.faeterj.tcc.repository.PacienteRepository;
-import com.faeterj.tcc.repository.RoleRepository;
-import com.faeterj.tcc.repository.UserRepository;
-
-import java.util.List;
-import java.util.Set;
-
+import com.faeterj.tcc.service.PasswordResetService;
+import com.faeterj.tcc.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-
+import java.util.List;
 
 @RestController
 public class UserController {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    private final PacienteRepository pacienteRepository;
+    private final PasswordResetService resetService;
 
-    private final RoleRepository roleRepository;
-
-    private final BCryptPasswordEncoder passwordEncoder;
-
-
-    public UserController(UserRepository userRepository, PacienteRepository pacienteRepository,
-            RoleRepository roleRepository, BCryptPasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.pacienteRepository = pacienteRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
+    public UserController(UserService userService, PasswordResetService resetService) {
+        this.userService = userService;
+        this.resetService = resetService;
     }
 
-    @Transactional
     @PostMapping("/register")
-    public ResponseEntity<Void> newUser (@RequestBody CreateUserDTO createUserDTO) 
-    {
-
-        var basicRole = roleRepository.findByName(Role.Values.BASIC.name());
-
-        var userFromUsernameDB = userRepository.findByUsername(createUserDTO.username());
-        var userFromEmailDB = userRepository.findByEmail(createUserDTO.email());
-        if (userFromUsernameDB.isPresent() || userFromEmailDB.isPresent())
-        {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
-            //TODO: Necessário refinar esse retorno informando se é o email ou o userName que já existe
+    public ResponseEntity<RequestResponseDTO> newUser(@RequestBody CreateUserDTO createUserDTO) {
+        try {
+            userService.registerNewUser(createUserDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new RequestResponseDTO("Usuário criado com sucesso.", 201));
+        } catch (ResponseStatusException e) {
+            if (e.getStatusCode() == HttpStatus.CONFLICT) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(new RequestResponseDTO(e.getReason(), 409));
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new RequestResponseDTO(e.getReason(), 500));
         }
+    }
 
-        var user = new User();
-        user.setUsername(createUserDTO.username());
-        user.setEmail(createUserDTO.email());
-        user.setName(createUserDTO.name());
-        user.setLastName(createUserDTO.lastName());
-        user.setPassword(passwordEncoder.encode(createUserDTO.password()));
-        user.setRoles(Set.of(basicRole));
-
-        // Salva o usuário e armazena o retorno na variável userSaved
-        User userSaved = userRepository.save(user);
-
-        var paciente = new Paciente();
-        paciente.setUser(userSaved);  // Define o user do paciente como o usuário recém-criado
-        paciente.setNomePaciente(createUserDTO.name());
-        paciente.setSobrenomePaciente(createUserDTO.lastName());
-        pacienteRepository.save(paciente);
-
-        return ResponseEntity.ok().build();
+    @PostMapping("/esqueci-minha-senha")
+    public ResponseEntity<RequestResponseDTO> forgotPassword(@RequestBody EsqueciMinhaSenhaDTO esqueciMinhaSenhaDTO) 
+    {
+        try {
+            String email = esqueciMinhaSenhaDTO.emailRecuperacao();
+            resetService.sendPasswordResetEmail(email);
+            return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("E-mail de redefinição enviado com sucesso!\n\n Verifique sua caixa de entrada e spam.", 200));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new RequestResponseDTO(e.getReason(), 500));
+        }
     }
 
     @GetMapping("/users")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<List<User>> listaUsuarios () 
-    {
-        var users = userRepository.findAll();
+    public ResponseEntity<List<User>> listaUsuarios() {
+        List<User> users = userService.listAllUsers();
         return ResponseEntity.ok(users);
     }
-    
-    
-
 }
