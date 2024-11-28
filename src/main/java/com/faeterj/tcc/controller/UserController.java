@@ -2,9 +2,11 @@ package com.faeterj.tcc.controller;
 
 import com.faeterj.tcc.dto.CreateUserDTO;
 import com.faeterj.tcc.dto.EsqueciMinhaSenhaDTO;
+import com.faeterj.tcc.dto.RedefinicaoSenhaDTO;
 import com.faeterj.tcc.dto.RequestResponseDTO;
 import com.faeterj.tcc.model.User;
 import com.faeterj.tcc.service.PasswordResetService;
+import com.faeterj.tcc.service.RedefinicaoSenhaService;
 import com.faeterj.tcc.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +23,13 @@ public class UserController {
 
     private final PasswordResetService resetService;
 
-    public UserController(UserService userService, PasswordResetService resetService) {
+    private final RedefinicaoSenhaService redefinicaoSenhaService;
+
+    public UserController(UserService userService, PasswordResetService resetService,
+            RedefinicaoSenhaService redefinicaoSenhaService) {
         this.userService = userService;
         this.resetService = resetService;
+        this.redefinicaoSenhaService = redefinicaoSenhaService;
     }
 
     @PostMapping("/register")
@@ -34,6 +40,19 @@ public class UserController {
         } catch (ResponseStatusException e) {
             if (e.getStatusCode() == HttpStatus.CONFLICT) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(new RequestResponseDTO(e.getReason(), 409));
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new RequestResponseDTO(e.getReason(), 500));
+        }
+    }
+
+    @PostMapping("/redefinicao-senha")
+    public ResponseEntity<RequestResponseDTO> resetPassword(@RequestBody RedefinicaoSenhaDTO redefinicaoSenhaDTO) {
+        try {
+            redefinicaoSenhaService.redefinirSenha(redefinicaoSenhaDTO);
+            return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Senha redefinida com sucesso!", 201));
+        } catch (ResponseStatusException e) {
+            if (e.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RequestResponseDTO(e.getReason(), 400));
             }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new RequestResponseDTO(e.getReason(), 500));
         }
