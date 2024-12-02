@@ -11,7 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.faeterj.tcc.dto.CreatePacienteDTO;
 import com.faeterj.tcc.dto.ListaPacientesDTO;
-import com.faeterj.tcc.dto.ListaItemDTO;
+import com.faeterj.tcc.dto.ReturnPacienteDTO;
 import com.faeterj.tcc.model.Paciente;
 import com.faeterj.tcc.model.Role;
 import com.faeterj.tcc.repository.PacienteRepository;
@@ -63,7 +63,7 @@ public class PacienteService {
 
         var listaPacientesPage = pacienteRepository.findByUserUserID(user.getUserID(),
                 PageRequest.of(page, pageSize, Sort.Direction.ASC, "dataCriacao"))
-                .map(listaItem -> new ListaItemDTO(
+                .map(listaItem -> new ReturnPacienteDTO(
                         listaItem.getPacienteId(),
                         listaItem.getNomePaciente(),
                         listaItem.getSobrenomePaciente(),

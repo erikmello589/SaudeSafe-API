@@ -5,6 +5,7 @@ import com.faeterj.tcc.dto.LoginResponse;
 import com.faeterj.tcc.model.Role;
 import com.faeterj.tcc.model.User;
 import com.faeterj.tcc.repository.UserRepository;
+
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -55,7 +56,8 @@ public class TokenService {
         var accessTokenExpiresIn = 900L; // 15 minutos
 
         // Gerar Access Token (contém apenas informações mínimas)
-        String accessTokenScopes = user.getRoles().stream()
+        String accessTokenScopes = user.getRoles()
+                .stream()
                 .map(Role::getName)
                 .collect(Collectors.joining(" "));
 
