@@ -28,7 +28,7 @@ public class User
     @Column(name = "user_id")
     private UUID userID;
 
-    @Column(unique = true) //TODO: Lembrar de adicionar o atributo NOTNULL em: username, email, nome, sobrenome e senha.
+    @Column(unique = true)
     private String username;
 
     @Column(unique = true)

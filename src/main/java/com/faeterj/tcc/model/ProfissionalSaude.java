@@ -5,10 +5,16 @@ import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -17,6 +23,7 @@ public class ProfissionalSaude
 {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "profissional_id")
     private UUID profissionalSaudeId;
 
     private String nomeProfissional;
@@ -25,7 +32,13 @@ public class ProfissionalSaude
 
     private String numeroClasseConselho;
 
-    private boolean profissionalIsVerified;
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "tb_profissionais_status",
+        joinColumns = @JoinColumn(name = "profissional_id"),
+        inverseJoinColumns = @JoinColumn(name = "status_id")
+    )
+    private StatusProfissional statusProfissional;
 
     @CreationTimestamp
     private Instant profissionalDataCriacao;
@@ -62,12 +75,12 @@ public class ProfissionalSaude
         this.numeroClasseConselho = numeroClasseConselho;
     }
 
-    public boolean getProfissionalIsVerified() {
-        return profissionalIsVerified;
+    public StatusProfissional getStatusProfissional() {
+        return statusProfissional;
     }
 
-    public void setProfissionalIsVerified(boolean profissionalIsVerified) {
-        this.profissionalIsVerified = profissionalIsVerified;
+    public void setStatusProfissional(StatusProfissional statusProfissional) {
+        this.statusProfissional = statusProfissional;
     }
 
     public Instant getProfissionalDataCriacao() {
@@ -77,4 +90,6 @@ public class ProfissionalSaude
     public void setProfissionalDataCriacao(Instant profissionalDataCriacao) {
         this.profissionalDataCriacao = profissionalDataCriacao;
     }
+
+    
 }

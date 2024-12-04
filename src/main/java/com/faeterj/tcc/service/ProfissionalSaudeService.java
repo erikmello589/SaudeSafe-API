@@ -35,7 +35,7 @@ public class ProfissionalSaudeService
         profissionalSaude.setNomeProfissional(dto.nomeProfissional());
         profissionalSaude.setEspecialidadeProfissional(dto.especialidadeProfissional());
         profissionalSaude.setNumeroClasseConselho(dto.numeroClasseConselho());
-        profissionalSaude.setProfissionalIsVerified(false);
+        // TODO: Adicionar o setStatusProfissional
 
         profissionalSaudeRepository.save(profissionalSaude);
     }
@@ -67,7 +67,7 @@ public class ProfissionalSaudeService
                     profissional.getNomeProfissional(),
                     profissional.getEspecialidadeProfissional(),
                     profissional.getNumeroClasseConselho(),
-                    profissional.getProfissionalIsVerified(),
+                    profissional.getStatusProfissional(),
                     profissional.getProfissionalDataCriacao()
                     ));
 
@@ -79,7 +79,7 @@ public class ProfissionalSaudeService
                 listaProfissionaisPage.getTotalElements());
     }
 
-    public void verificarProfissional(UUID idProfissional, JwtAuthenticationToken token) {
+    /*public void verificarProfissional(UUID idProfissional, JwtAuthenticationToken token) {
         var profissional = profissionalSaudeRepository.findById(idProfissional)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profissional não encontrado"));
 
@@ -95,5 +95,8 @@ public class ProfissionalSaudeService
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a deletar este Profissional.");
         }
-    }
+    }*/
+
+    // TODO: Criar nova funcionalidade de verificar profissional. 
+
 }

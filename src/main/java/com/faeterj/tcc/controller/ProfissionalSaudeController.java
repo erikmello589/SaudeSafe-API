@@ -43,7 +43,7 @@ public class ProfissionalSaudeController {
         }
     }
 
-    @GetMapping("/VerificarProfissional/{id}")
+    /*@GetMapping("/VerificarProfissional/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<RequestResponseDTO> verificaProfissional(@PathVariable("id") UUID idProfissional, JwtAuthenticationToken token) 
     {
@@ -58,5 +58,7 @@ public class ProfissionalSaudeController {
             }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new RequestResponseDTO(e.getReason(), 500));
         }
-    }
+    }*/
+
+    //TODO: Criar novo endpoint para verificar o profissional de saude (POST)
 }
