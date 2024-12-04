@@ -14,18 +14,22 @@ import com.faeterj.tcc.dto.ListaProfissionaisDTO;
 import com.faeterj.tcc.dto.ReturnProfissionalDTO;
 import com.faeterj.tcc.model.ProfissionalSaude;
 import com.faeterj.tcc.model.Role;
+import com.faeterj.tcc.model.StatusProfissional;
 import com.faeterj.tcc.repository.ProfissionalSaudeRepository;
+import com.faeterj.tcc.repository.StatusProfissionalRepository;
 import com.faeterj.tcc.repository.UserRepository;
 
 @Service
 public class ProfissionalSaudeService 
 {
     private final ProfissionalSaudeRepository profissionalSaudeRepository;
+    private final StatusProfissionalRepository statusProfissionalRepository;
     private final UserRepository userRepository;
 
     public ProfissionalSaudeService(ProfissionalSaudeRepository profissionalSaudeRepository,
-            UserRepository userRepository) {
+            StatusProfissionalRepository statusProfissionalRepository, UserRepository userRepository) {
         this.profissionalSaudeRepository = profissionalSaudeRepository;
+        this.statusProfissionalRepository = statusProfissionalRepository;
         this.userRepository = userRepository;
     }
 
@@ -35,7 +39,8 @@ public class ProfissionalSaudeService
         profissionalSaude.setNomeProfissional(dto.nomeProfissional());
         profissionalSaude.setEspecialidadeProfissional(dto.especialidadeProfissional());
         profissionalSaude.setNumeroClasseConselho(dto.numeroClasseConselho());
-        // TODO: Adicionar o setStatusProfissional
+        StatusProfissional statusProfissional = statusProfissionalRepository.findByName(StatusProfissional.Values.SOB_ANALISE.name());
+        profissionalSaude.setStatusProfissional(statusProfissional);
 
         profissionalSaudeRepository.save(profissionalSaude);
     }
