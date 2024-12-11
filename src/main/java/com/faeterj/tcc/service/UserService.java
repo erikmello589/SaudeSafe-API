@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -71,5 +72,10 @@ public class UserService {
 
     public List<User> listAllUsers() {
         return userRepository.findAll();
+    }
+
+    public User acharUserPorId(UUID idUser) {
+        return userRepository.findById(idUser)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
     }
 }

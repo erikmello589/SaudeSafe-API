@@ -14,5 +14,5 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Long>
      * @param pageable Informações de paginação.
      * @return Página de pacientes.
      */
-    Page<Consulta> findByPacienteId(Long pacienteID, Pageable pageable);
+    Page<Consulta> findByPacientePacienteId(Long pacienteID, Pageable pageable);
 }

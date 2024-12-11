@@ -14,6 +14,7 @@ import com.faeterj.tcc.dto.ListaPacientesDTO;
 import com.faeterj.tcc.dto.ReturnPacienteDTO;
 import com.faeterj.tcc.model.Paciente;
 import com.faeterj.tcc.model.Role;
+import com.faeterj.tcc.model.User;
 import com.faeterj.tcc.repository.PacienteRepository;
 import com.faeterj.tcc.repository.UserRepository;
 
@@ -28,10 +29,8 @@ public class PacienteService {
         this.userRepository = userRepository;
     }
 
-    public void criarPaciente(CreatePacienteDTO dto, JwtAuthenticationToken token) {
-        var user = userRepository.findById(UUID.fromString(token.getName()))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
-
+    public void criarPaciente(CreatePacienteDTO dto, User user) 
+    {
         Paciente paciente = new Paciente();
         paciente.setUser(user);
         paciente.setNomePaciente(dto.nomePaciente());
@@ -40,12 +39,10 @@ public class PacienteService {
         pacienteRepository.save(paciente);
     }
 
-    public void deletarPaciente(Long idPaciente, JwtAuthenticationToken token) {
-        var paciente = pacienteRepository.findById(idPaciente)
+    public void deletarPaciente(Long idPaciente, User user) 
+    {
+        Paciente paciente = pacienteRepository.findById(idPaciente)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente não encontrado"));
-
-        var user = userRepository.findById(UUID.fromString(token.getName()))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
 
         boolean isAdmin = user.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase(Role.Values.ADMIN.name()));
@@ -58,7 +55,7 @@ public class PacienteService {
     }
 
     public ListaPacientesDTO listarPacientes(int page, int pageSize, JwtAuthenticationToken token) {
-        var user = userRepository.findById(UUID.fromString(token.getName()))
+        User user = userRepository.findById(UUID.fromString(token.getName()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
 
         var listaPacientesPage = pacienteRepository.findByUserUserID(user.getUserID(),
@@ -75,5 +72,10 @@ public class PacienteService {
                 pageSize,
                 listaPacientesPage.getTotalPages(),
                 listaPacientesPage.getTotalElements());
+    }
+
+    public Paciente acharPacientePorId(Long idPaciente) {
+        return pacienteRepository.findById(idPaciente)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente não encontrado"));
     }
 }

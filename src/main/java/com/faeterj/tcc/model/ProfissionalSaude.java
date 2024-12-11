@@ -12,8 +12,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
@@ -27,21 +25,15 @@ public class ProfissionalSaude
     private UUID profissionalSaudeId;
 
     private String nomeProfissional;
-
     private String especialidadeProfissional;
-
     private String numeroClasseConselho;
-
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "tb_profissionais_status",
-        joinColumns = @JoinColumn(name = "profissional_id"),
-        inverseJoinColumns = @JoinColumn(name = "status_id")
-    )
-    private StatusProfissional statusProfissional;
+    private String estadoProfissional;
 
     @CreationTimestamp
     private Instant profissionalDataCriacao;
+
+    @OneToOne(mappedBy = "profissionalSaude", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private StatusProfissional statusProfissional; // Relacionamento com StatusProfissional
 
     public UUID getProfissionalSaudeId() {
         return profissionalSaudeId;
@@ -75,12 +67,12 @@ public class ProfissionalSaude
         this.numeroClasseConselho = numeroClasseConselho;
     }
 
-    public StatusProfissional getStatusProfissional() {
-        return statusProfissional;
+    public String getEstadoProfissional() {
+        return estadoProfissional;
     }
 
-    public void setStatusProfissional(StatusProfissional statusProfissional) {
-        this.statusProfissional = statusProfissional;
+    public void setEstadoProfissional(String estadoProfissional) {
+        this.estadoProfissional = estadoProfissional;
     }
 
     public Instant getProfissionalDataCriacao() {
@@ -91,5 +83,12 @@ public class ProfissionalSaude
         this.profissionalDataCriacao = profissionalDataCriacao;
     }
 
+    public StatusProfissional getStatusProfissional() {
+        return statusProfissional;
+    }
+
+    public void setStatusProfissional(StatusProfissional statusProfissional) {
+        this.statusProfissional = statusProfissional;
+    }
     
 }

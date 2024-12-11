@@ -5,8 +5,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.faeterj.tcc.dto.CreatePacienteDTO;
 import com.faeterj.tcc.dto.RequestResponseDTO;
-
+import com.faeterj.tcc.model.User;
 import com.faeterj.tcc.service.PacienteService;
+import com.faeterj.tcc.service.UserService;
+
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,16 +27,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class PacienteController {
 
     private final PacienteService pacienteService;
+    private final UserService userService;
 
-    public PacienteController(PacienteService pacienteService) {
+    public PacienteController(PacienteService pacienteService, UserService userService) {
         this.pacienteService = pacienteService;
+        this.userService = userService;
     }
 
     @PostMapping("/NovoPaciente")
     public ResponseEntity<RequestResponseDTO> criarPaciente(@RequestBody CreatePacienteDTO dto, JwtAuthenticationToken token) {
         try 
-        {
-            pacienteService.criarPaciente(dto, token);
+        {  
+            User user = userService.acharUserPorId(UUID.fromString(token.getName()));
+            pacienteService.criarPaciente(dto, user);
             return ResponseEntity.status(HttpStatus.CREATED).body(new RequestResponseDTO("Paciente criado com sucesso.", 201));
         } 
         catch (ResponseStatusException e) {
@@ -49,7 +55,8 @@ public class PacienteController {
     {
         try 
         {
-            pacienteService.deletarPaciente(idPaciente, token);
+            User user = userService.acharUserPorId(UUID.fromString(token.getName()));
+            pacienteService.deletarPaciente(idPaciente, user);
             return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Paciente Deletado com sucesso.", 200));
         } 
         catch (ResponseStatusException e) {
