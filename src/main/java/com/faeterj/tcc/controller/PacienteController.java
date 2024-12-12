@@ -43,10 +43,7 @@ public class PacienteController {
             return ResponseEntity.status(HttpStatus.CREATED).body(new RequestResponseDTO("Paciente criado com sucesso.", 201));
         } 
         catch (ResponseStatusException e) {
-            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RequestResponseDTO(e.getReason(), 404));
-            }
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new RequestResponseDTO(e.getReason(), 500));
+            return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
         }
     }
     
@@ -60,15 +57,7 @@ public class PacienteController {
             return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Paciente Deletado com sucesso.", 200));
         } 
         catch (ResponseStatusException e) {
-            if (e.getStatusCode() == HttpStatus.NOT_FOUND) 
-            {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RequestResponseDTO(e.getReason(), 404));
-            }
-            if (e.getStatusCode() == HttpStatus.FORBIDDEN) 
-            {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new RequestResponseDTO(e.getReason(), 403));
-            }
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new RequestResponseDTO(e.getReason(), 500));
+            return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
         }
     }
 
@@ -83,13 +72,7 @@ public class PacienteController {
             return ResponseEntity.status(HttpStatus.OK).body(listaPacientes);
         } 
         catch (ResponseStatusException e) {
-            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RequestResponseDTO(e.getReason(), 404));
-            }
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new RequestResponseDTO(e.getReason(), 500));
+            return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
         }
     }
-
-    
-    
 }

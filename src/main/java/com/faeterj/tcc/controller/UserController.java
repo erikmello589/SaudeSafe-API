@@ -38,10 +38,7 @@ public class UserController {
             userService.registerNewUser(createUserDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(new RequestResponseDTO("Usuário criado com sucesso.", 201));
         } catch (ResponseStatusException e) {
-            if (e.getStatusCode() == HttpStatus.CONFLICT) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(new RequestResponseDTO(e.getReason(), 409));
-            }
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new RequestResponseDTO(e.getReason(), 500));
+            return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
         }
     }
 
@@ -51,10 +48,7 @@ public class UserController {
             redefinicaoSenhaService.redefinirSenha(redefinicaoSenhaDTO);
             return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Senha redefinida com sucesso!", 201));
         } catch (ResponseStatusException e) {
-            if (e.getStatusCode() == HttpStatus.BAD_REQUEST) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RequestResponseDTO(e.getReason(), 400));
-            }
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new RequestResponseDTO(e.getReason(), 500));
+            return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
         }
     }
 
@@ -66,7 +60,7 @@ public class UserController {
             resetService.sendPasswordResetEmail(email);
             return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("E-mail de redefinição enviado com sucesso!\n\n Verifique sua caixa de entrada e spam.", 200));
         } catch (ResponseStatusException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new RequestResponseDTO(e.getReason(), 500));
+            return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
         }
     }
 

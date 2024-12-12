@@ -37,10 +37,7 @@ public class ConsultaController {
             return ResponseEntity.status(HttpStatus.CREATED).body(new RequestResponseDTO("Consulta criada com sucesso.", 201));
         } 
         catch (ResponseStatusException e) {
-            if (e.getStatusCode() == HttpStatus.FORBIDDEN) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new RequestResponseDTO(e.getReason(), 404));
-            }
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new RequestResponseDTO(e.getReason(), 500));
+            return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
         }
     }
 }
