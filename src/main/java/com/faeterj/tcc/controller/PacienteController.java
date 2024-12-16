@@ -34,7 +34,7 @@ public class PacienteController {
         this.userService = userService;
     }
 
-    @PostMapping("/NovoPaciente")
+    @PostMapping("/paciente")
     public ResponseEntity<RequestResponseDTO> criarPaciente(@RequestBody CreatePacienteDTO dto, JwtAuthenticationToken token) {
         try 
         {  
@@ -47,7 +47,7 @@ public class PacienteController {
         }
     }
     
-    @DeleteMapping("/DeletePaciente/{id}")
+    @DeleteMapping("/paciente/{id}")
     public ResponseEntity<RequestResponseDTO> deletaPaciente (@PathVariable("id") Long idPaciente, JwtAuthenticationToken token)
     {
         try 
@@ -61,7 +61,7 @@ public class PacienteController {
         }
     }
 
-    @GetMapping("/Pacientes")
+    @GetMapping("/pacientes")
     public ResponseEntity<?> listaPacientesUser(@RequestParam(value = "page", defaultValue = "0") int page, 
             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
             JwtAuthenticationToken token) 

@@ -38,7 +38,7 @@ public class TokenController {
         }
     }
 
-    @PostMapping("/refresh")
+    @PostMapping("/refresh-login")
     public ResponseEntity<LoginResponse> refreshToken(JwtAuthenticationToken refreshTokenRecebido) {
         try {
             LoginResponse response = tokenService.refreshToken(refreshTokenRecebido);

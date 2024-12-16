@@ -30,6 +30,18 @@ public class EstabelecimentoSaudeService
         return estabelecimentoSaudeRepository.save(estabelecimentoSaude);
     }
 
+    public EstabelecimentoSaude editarEstabelecimento(Long idEstabelecimento, CreateEstabelecimentoDTO dto) 
+    {
+        EstabelecimentoSaude estabelecimentoSaude = estabelecimentoSaudeRepository.findById(idEstabelecimento)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Estabelecimento não encontrado"));
+
+        estabelecimentoSaude.setNomeEstabelecimento(dto.nomeEstabelecimento());
+        estabelecimentoSaude.setCepEstabelecimento(dto.cepEstabelecimento());
+        estabelecimentoSaude.setEnderecoEstabelecimento(dto.enderecoEstabelecimento());
+
+        return estabelecimentoSaudeRepository.save(estabelecimentoSaude);
+    }
+
 
     public void deletarEstabelecimento(Long idEstabelecimento, User user) {
         EstabelecimentoSaude estabelecimento = estabelecimentoSaudeRepository.findById(idEstabelecimento)

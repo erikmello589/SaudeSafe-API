@@ -32,7 +32,7 @@ public class UserController {
         this.redefinicaoSenhaService = redefinicaoSenhaService;
     }
 
-    @PostMapping("/register")
+    @PostMapping("/cadastrar")
     public ResponseEntity<RequestResponseDTO> newUser(@RequestBody CreateUserDTO createUserDTO) {
         try {
             userService.registerNewUser(createUserDTO);

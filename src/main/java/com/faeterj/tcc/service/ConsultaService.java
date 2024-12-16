@@ -8,6 +8,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.faeterj.tcc.dto.CreateConsultaDTO;
 import com.faeterj.tcc.dto.CreateEstabelecimentoDTO;
 import com.faeterj.tcc.dto.CreateProfissionalDTO;
+import com.faeterj.tcc.dto.EditConsultaDTO;
 import com.faeterj.tcc.dto.ListaConsultasPacienteDTO;
 import com.faeterj.tcc.dto.ReturnConsultaPacienteDTO;
 import com.faeterj.tcc.model.Consulta;
@@ -79,9 +80,12 @@ public class ConsultaService
     {
         Paciente paciente = pacienteService.acharPacientePorId(idPaciente);
 
-        if (paciente.getUser().getUserID().equals(user.getUserID())) 
+        if (!paciente.getUser().getUserID().equals(user.getUserID())) 
         {
-            var listaConsultasPacientePage = consultaRepository.findByPacientePacienteId(idPaciente,
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a visualizar as consultas deste paciente");
+        } 
+        
+        var listaConsultasPacientePage = consultaRepository.findByPacientePacienteId(idPaciente,
                 PageRequest.of(page, pageSize, Sort.Direction.ASC, "consultaData"))
                 .map(listaItem -> new ReturnConsultaPacienteDTO(
                         listaItem.getConsultaId(),
@@ -92,17 +96,34 @@ public class ConsultaService
                         listaItem.getObservacaoConsulta(),
                         listaItem.getConsultaData()));
 
-            return new ListaConsultasPacienteDTO(
-                        listaConsultasPacientePage.getContent(),
-                        page,
-                        pageSize,
-                        listaConsultasPacientePage.getTotalPages(),
-                        listaConsultasPacientePage.getTotalElements());
-        } 
-        else 
+        return new ListaConsultasPacienteDTO(
+                    listaConsultasPacientePage.getContent(),
+                    page,
+                    pageSize,
+                    listaConsultasPacientePage.getTotalPages(),
+                    listaConsultasPacientePage.getTotalElements());
+    }
+
+    public void editaConsulta(Long idConsulta, EditConsultaDTO dto, User user) 
+    {
+        Consulta consulta = consultaRepository.findById(idConsulta)
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada"));
+
+        if (!consulta.getPaciente().getUser().getUserID().equals(user.getUserID())) 
         {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a visualizar as consultas deste paciente");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a editar as consultas deste paciente"); 
         }
+
+        CreateEstabelecimentoDTO estabelecimentoDTO = new CreateEstabelecimentoDTO(dto.nomeEstabelecimento(), dto.cepEstabelecimento(), dto.enderecoEstabelecimento());
+        EstabelecimentoSaude estabelecimentoSaude = estabelecimentoSaudeService.editarEstabelecimento(consulta.getEstabelecimentoSaude().getEstabelecimentoId(), estabelecimentoDTO);
+        
+        consulta.setEstabelecimentoSaude(estabelecimentoSaude);
+        consulta.setMotivoConsulta(dto.motivoConsulta());
+        consulta.setObservacaoConsulta(dto.observacaoConsulta());
+        consulta.setConsultaData(dto.consultaData());
+
+        consultaRepository.save(consulta);
+        
     }
 
     /*public void listarConsultasUser(Long idPaciente, User user) 

@@ -1,7 +1,6 @@
 package com.faeterj.tcc.model;
 
 import java.time.Instant;
-import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -12,17 +11,23 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "tb_profissional_saude")
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Table(name = "tb_profissional_saude", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"numeroClasseConselho", "estadoProfissional"})
+})
 public class ProfissionalSaude 
 {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "profissional_id")
-    private UUID profissionalSaudeId;
+    private Long profissionalSaudeId;
 
     private String nomeProfissional;
     private String especialidadeProfissional;
@@ -33,13 +38,13 @@ public class ProfissionalSaude
     private Instant profissionalDataCriacao;
 
     @OneToOne(mappedBy = "profissionalSaude", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private StatusProfissional statusProfissional; // Relacionamento com StatusProfissional
+    private StatusProfissional statusProfissional;
 
-    public UUID getProfissionalSaudeId() {
+    public Long getProfissionalSaudeId() {
         return profissionalSaudeId;
     }
 
-    public void setProfissionalSaudeId(UUID profissionalSaudeId) {
+    public void setProfissionalSaudeId(Long profissionalSaudeId) {
         this.profissionalSaudeId = profissionalSaudeId;
     }
 
