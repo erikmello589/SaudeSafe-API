@@ -1,5 +1,7 @@
 package com.faeterj.tcc.service;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -121,6 +123,11 @@ public class ProfissionalSaudeService
         return profissionalSaudeRepository.findById(idProfissional)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
     }
+
+    public Optional<ProfissionalSaude> acharProfissionalPorConselhoEstado(String numeroClasseConselho, String estadoProfissional) {
+        return profissionalSaudeRepository.findByNumeroClasseConselhoAndEstadoProfissional(numeroClasseConselho, estadoProfissional);
+    }
+
 
     public void verificarProfissional(User user, VerificaProfissionalDTO dto) 
     {

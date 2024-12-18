@@ -14,7 +14,7 @@ import com.faeterj.tcc.dto.ReturnConsultaPacienteDTO;
 import com.faeterj.tcc.model.Consulta;
 import com.faeterj.tcc.model.EstabelecimentoSaude;
 import com.faeterj.tcc.model.Paciente;
-import com.faeterj.tcc.model.ProfissionalSaude;
+import com.faeterj.tcc.model.ProfissionalConsulta;
 import com.faeterj.tcc.model.Role;
 import com.faeterj.tcc.model.User;
 import com.faeterj.tcc.repository.ConsultaRepository;
@@ -23,14 +23,14 @@ import com.faeterj.tcc.repository.ConsultaRepository;
 public class ConsultaService 
 {
     private final PacienteService pacienteService;
-    private final ProfissionalSaudeService profissionalSaudeService;
+    private final ProfissionalConsultaService profissionalConsultaService;
     private final EstabelecimentoSaudeService estabelecimentoSaudeService;
     private final ConsultaRepository consultaRepository;
 
-    public ConsultaService(PacienteService pacienteService, ProfissionalSaudeService profissionalSaudeService,
+    public ConsultaService(PacienteService pacienteService, ProfissionalConsultaService profissionalConsultaService,
             EstabelecimentoSaudeService estabelecimentoSaudeService, ConsultaRepository consultaRepository) {
         this.pacienteService = pacienteService;
-        this.profissionalSaudeService = profissionalSaudeService;
+        this.profissionalConsultaService = profissionalConsultaService;
         this.estabelecimentoSaudeService = estabelecimentoSaudeService;
         this.consultaRepository = consultaRepository;
     }
@@ -45,18 +45,24 @@ public class ConsultaService
         }
 
         CreateProfissionalDTO profissionalSaudeDTO = new CreateProfissionalDTO(dto.nomeProfissional(), dto.especialidadeProfissional(), dto.numeroClasseConselho(), dto.estadoProfissional());
-        ProfissionalSaude profissionalSaude = profissionalSaudeService.criarProfissional(profissionalSaudeDTO);
+        ProfissionalConsulta profissionalConsulta = profissionalConsultaService.criarProfissionalConsulta(profissionalSaudeDTO);
 
         CreateEstabelecimentoDTO estabelecimentoDTO = new CreateEstabelecimentoDTO(dto.nomeEstabelecimento(), dto.cepEstabelecimento(), dto.enderecoEstabelecimento());
         EstabelecimentoSaude estabelecimentoSaude = estabelecimentoSaudeService.criarEstabelecimento(estabelecimentoDTO);
        
         Consulta consulta = new Consulta();
         consulta.setPaciente(paciente);
-        consulta.setProfissionalSaude(profissionalSaude);
+        consulta.setProfissionalConsulta(profissionalConsulta);
         consulta.setEstabelecimentoSaude(estabelecimentoSaude);
         consulta.setMotivoConsulta(dto.motivoConsulta());
         consulta.setObservacaoConsulta(dto.observacaoConsulta());
         consulta.setConsultaData(dto.consultaData());
+
+        consulta = consultaRepository.save(consulta);
+
+        profissionalConsulta = profissionalConsultaService.inserirConsultaAoProfissional(profissionalConsulta.getProfissionalSaudeId(), consulta.getConsultaId());
+
+        consulta.setProfissionalConsulta(profissionalConsulta);
 
         consultaRepository.save(consulta);
     }
@@ -90,7 +96,7 @@ public class ConsultaService
                 .map(listaItem -> new ReturnConsultaPacienteDTO(
                         listaItem.getConsultaId(),
                         listaItem.getPaciente(),
-                        listaItem.getProfissionalSaude(),
+                        listaItem.getProfissionalConsulta(),
                         listaItem.getEstabelecimentoSaude(),
                         listaItem.getMotivoConsulta(),
                         listaItem.getObservacaoConsulta(),

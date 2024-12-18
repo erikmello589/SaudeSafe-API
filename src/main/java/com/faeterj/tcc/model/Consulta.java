@@ -29,7 +29,7 @@ public class Consulta
 
     @ManyToOne
     @JoinColumn(name = "profissional_id")
-    private ProfissionalSaude profissionalSaude;
+    private ProfissionalConsulta profissionalConsulta;
 
     @OneToOne
     @JoinColumn(name = "estabelecimento_id")
@@ -60,12 +60,12 @@ public class Consulta
         this.paciente = paciente;
     }
 
-    public ProfissionalSaude getProfissionalSaude() {
-        return profissionalSaude;
+    public ProfissionalConsulta getProfissionalConsulta() {
+        return profissionalConsulta;
     }
 
-    public void setProfissionalSaude(ProfissionalSaude profissionalSaude) {
-        this.profissionalSaude = profissionalSaude;
+    public void setProfissionalConsulta(ProfissionalConsulta profissionalConsulta) {
+        this.profissionalConsulta = profissionalConsulta;
     }
 
     public EstabelecimentoSaude getEstabelecimentoSaude() {
