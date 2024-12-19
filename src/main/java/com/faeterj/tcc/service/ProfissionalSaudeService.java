@@ -46,13 +46,13 @@ public class ProfissionalSaudeService
         // Criar o StatusProfissional inicial
         StatusProfissional statusProfissional = new StatusProfissional();
         statusProfissional.setStatus(StatusEnum.SOB_ANALISE); // Status inicial padrão
-        statusProfissional.setProfissionalSaude(profissionalSaude);
+        statusProfissional.setProfissionalId(profissionalSaude.getProfissionalSaudeId());
 
         // Salvar o StatusProfissional
         statusProfissional = statusProfissionalRepository.save(statusProfissional);
 
         // Vincular o status ao profissional
-        profissionalSaude.setStatusProfissional(statusProfissional);
+        profissionalSaude.setStatusId(statusProfissional.getStatusId());
 
         // Salvar novamente o profissional com o devido status inicial (SOB ANALISE)
         return profissionalSaudeRepository.save(profissionalSaude);
@@ -107,7 +107,7 @@ public class ProfissionalSaudeService
                     profissional.getEspecialidadeProfissional(),
                     profissional.getNumeroClasseConselho(),
                     profissional.getEstadoProfissional(),
-                    profissional.getStatusProfissional(),
+                    acharStatusProfissionalPorStatusId(profissional.getStatusId()),
                     profissional.getProfissionalDataCriacao()
                     ));
 
@@ -149,7 +149,7 @@ public class ProfissionalSaudeService
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status requisitado é inválido.");
             }
             
-            StatusProfissional statusProfissional = statusProfissionalRepository.findByProfissionalSaudeProfissionalSaudeId(profissional.getProfissionalSaudeId());
+            StatusProfissional statusProfissional = statusProfissionalRepository.findByProfissionalId(profissional.getProfissionalSaudeId());
             statusProfissional.setStatus(status); 
             statusProfissional = statusProfissionalRepository.save(statusProfissional);
         } 
@@ -157,6 +157,11 @@ public class ProfissionalSaudeService
         {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a fazer essa verificação.");
         }
+    }
+
+    public StatusProfissional acharStatusProfissionalPorStatusId(Long statusId) {
+        return statusProfissionalRepository.findById(statusId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "StatusProfissional não encontrado"));
     }
     
 

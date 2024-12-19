@@ -4,16 +4,13 @@ import java.time.Instant;
 
 import org.hibernate.annotations.CreationTimestamp;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
@@ -37,8 +34,7 @@ public class ProfissionalSaude
     @CreationTimestamp
     private Instant profissionalDataCriacao;
 
-    @OneToOne(mappedBy = "profissionalSaude", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private StatusProfissional statusProfissional;
+    private Long statusId;
 
     public Long getProfissionalSaudeId() {
         return profissionalSaudeId;
@@ -88,12 +84,12 @@ public class ProfissionalSaude
         this.profissionalDataCriacao = profissionalDataCriacao;
     }
 
-    public StatusProfissional getStatusProfissional() {
-        return statusProfissional;
+    public Long getStatusId() {
+        return statusId;
     }
 
-    public void setStatusProfissional(StatusProfissional statusProfissional) {
-        this.statusProfissional = statusProfissional;
+    public void setStatusId(Long statusId) {
+        this.statusId = statusId;
     }
     
 }

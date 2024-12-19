@@ -96,7 +96,7 @@ public class ConsultaService
                 .map(listaItem -> new ReturnConsultaPacienteDTO(
                         listaItem.getConsultaId(),
                         listaItem.getPaciente(),
-                        listaItem.getProfissionalConsulta(),
+                        profissionalConsultaService.profissionalConsultaToDTO(listaItem.getProfissionalConsulta()) ,
                         listaItem.getEstabelecimentoSaude(),
                         listaItem.getMotivoConsulta(),
                         listaItem.getObservacaoConsulta(),

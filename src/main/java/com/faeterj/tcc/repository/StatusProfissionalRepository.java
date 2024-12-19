@@ -5,5 +5,5 @@ import com.faeterj.tcc.model.StatusProfissional;
 
 public interface StatusProfissionalRepository extends JpaRepository<StatusProfissional, Long>
 {
-    StatusProfissional findByProfissionalSaudeProfissionalSaudeId(Long profissionalId);
+    StatusProfissional findByProfissionalId(Long profissionalId);
 }

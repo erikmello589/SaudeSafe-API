@@ -7,8 +7,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 import java.time.Instant;
@@ -26,10 +24,9 @@ public class StatusProfissional {
     @Column(name = "status_id")
     private Long statusId;
 
-    @OneToOne
-    @JoinColumn(name = "profissional_id")
+    @Column(name = "profissional_id")
     @JsonIgnore  
-    private ProfissionalSaude profissionalSaude;
+    private Long profissionalId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
@@ -39,12 +36,20 @@ public class StatusProfissional {
     @Column(name = "ultima_modificacao", nullable = false)
     private Instant ultimaModificacao;
 
-    public ProfissionalSaude getProfissionalSaude() {
-        return profissionalSaude;
+    public Long getStatusId() {
+        return statusId;
     }
 
-    public void setProfissionalSaude(ProfissionalSaude profissionalSaude) {
-        this.profissionalSaude = profissionalSaude;
+    public void setStatusId(Long statusId) {
+        this.statusId = statusId;
+    }
+
+    public Long getProfissionalId() {
+        return profissionalId;
+    }
+
+    public void setProfissionalId(Long profissionalId) {
+        this.profissionalId = profissionalId;
     }
 
     public StatusEnum getStatus() {

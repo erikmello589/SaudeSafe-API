@@ -5,9 +5,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.faeterj.tcc.dto.CreateProfissionalDTO;
+import com.faeterj.tcc.dto.ReturnProfissionalDTO;
 import com.faeterj.tcc.model.ProfissionalConsulta;
 import com.faeterj.tcc.model.ProfissionalSaude;
-import com.faeterj.tcc.model.StatusProfissional;
 import com.faeterj.tcc.repository.ProfissionalConsultaRepository;
 
 @Service
@@ -24,9 +24,10 @@ public class ProfissionalConsultaService
 
     public ProfissionalConsulta criarProfissionalConsulta(CreateProfissionalDTO dto) {
         // Recuperar ou criar o ProfissionalSaude
-        ProfissionalSaude profissionalSaude = profissionalSaudeService
-                .acharProfissionalPorConselhoEstado(dto.numeroClasseConselho(), dto.estadoProfissional())
+        ProfissionalSaude profissionalSaude = profissionalSaudeService.acharProfissionalPorConselhoEstado(dto.numeroClasseConselho(), dto.estadoProfissional())
                 .orElse(profissionalSaudeService.criarProfissional(dto));
+
+        System.out.println("\n\n\nATENCAO AQUI:" + profissionalSaude.getNomeProfissional() + "\n\n\n");
     
         // Criar uma nova instância de ProfissionalConsulta
         ProfissionalConsulta profissionalConsulta = new ProfissionalConsulta();
@@ -35,9 +36,8 @@ public class ProfissionalConsultaService
         profissionalConsulta.setNumeroClasseConselho(dto.numeroClasseConselho());
         profissionalConsulta.setEstadoProfissional(dto.estadoProfissional());
     
-        // Compartilhar o StatusProfissional existente
-        StatusProfissional statusProfissional = profissionalSaude.getStatusProfissional();
-        profissionalConsulta.setStatusProfissional(statusProfissional);
+        // Compartilhar o id do StatusProfissional existente
+        profissionalConsulta.setStatusId(profissionalSaude.getStatusId());
     
         // Salvar a nova entidade ProfissionalConsulta
         return profissionalConsultaRepository.save(profissionalConsulta);
@@ -51,5 +51,18 @@ public class ProfissionalConsultaService
         
         profissionalConsulta.setConsultaId(idConsulta);
         return profissionalConsultaRepository.save(profissionalConsulta);
+    }
+
+    public ReturnProfissionalDTO profissionalConsultaToDTO(ProfissionalConsulta profissional)
+    {
+        ReturnProfissionalDTO profissionalConsultaDTO = new ReturnProfissionalDTO(profissional.getProfissionalSaudeId(),
+            profissional.getNomeProfissional(),    
+            profissional.getEspecialidadeProfissional(), 
+            profissional.getNumeroClasseConselho(), 
+            profissional.getEstadoProfissional(), 
+            profissionalSaudeService.acharStatusProfissionalPorStatusId(profissional.getStatusId()), 
+            profissional.getProfissionalDataCriacao());
+        
+        return profissionalConsultaDTO;
     }
 }

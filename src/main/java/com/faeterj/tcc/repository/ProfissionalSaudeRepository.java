@@ -32,10 +32,10 @@ public interface ProfissionalSaudeRepository extends JpaRepository<ProfissionalS
      * @param estadoProfissional estado/UF do do profissional desejado.
      * @return <optional> Profissional desejado.
      */
-    @Query("SELECT p FROM ProfissionalSaude p WHERE p.numeroClasseConselho = :numeroClasseConselho AND p.estadoProfissional = :estadoProfissional")
+    @Query("SELECT p FROM ProfissionalSaude p WHERE TYPE(p) = ProfissionalSaude AND p.numeroClasseConselho = :numeroClasseConselho AND p.estadoProfissional = :estadoProfissional")
     Optional<ProfissionalSaude> findByNumeroClasseConselhoAndEstadoProfissional(
-            @Param("numeroClasseConselho") String numeroClasseConselho, 
-            @Param("estadoProfissional") String estadoProfissional
+        @Param("numeroClasseConselho") String numeroClasseConselho, 
+        @Param("estadoProfissional") String estadoProfissional
     );
 
 }
