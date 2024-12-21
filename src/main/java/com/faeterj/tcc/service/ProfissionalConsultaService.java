@@ -63,4 +63,25 @@ public class ProfissionalConsultaService
         
         return profissionalConsultaDTO;
     }
+
+    public ProfissionalConsulta editarProfissionalConsulta(Long idProfissional, CreateProfissionalDTO dto)
+    {
+        ProfissionalConsulta profissionalConsulta = profissionalConsultaRepository.findById(idProfissional)
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profissional desta Consulta não foi encontrado"));
+
+        // achar ou criar o ProfissionalSaude
+        ProfissionalSaude profissionalSaude = profissionalSaudeService.acharProfissionalPorConselhoEstado(dto.numeroClasseConselho(), dto.estadoProfissional())
+                                .orElseGet(() -> profissionalSaudeService.criarProfissional(dto));
+
+        profissionalConsulta.setNomeProfissional(dto.nomeProfissional());
+        profissionalConsulta.setEspecialidadeProfissional(dto.especialidadeProfissional());
+        profissionalConsulta.setNumeroClasseConselho(dto.numeroClasseConselho());
+        profissionalConsulta.setEstadoProfissional(dto.estadoProfissional());
+                        
+        // Compartilhar o id do StatusProfissional existente
+        profissionalConsulta.setStatusId(profissionalSaude.getStatusId());
+                        
+        // Salvar a nova entidade ProfissionalConsulta
+        return profissionalConsultaRepository.save(profissionalConsulta);
+    }
 }

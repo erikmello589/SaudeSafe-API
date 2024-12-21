@@ -8,7 +8,6 @@ import org.springframework.web.server.ResponseStatusException;
 import com.faeterj.tcc.dto.CreateConsultaDTO;
 import com.faeterj.tcc.dto.CreateEstabelecimentoDTO;
 import com.faeterj.tcc.dto.CreateProfissionalDTO;
-import com.faeterj.tcc.dto.EditConsultaDTO;
 import com.faeterj.tcc.dto.ListaConsultasPacienteDTO;
 import com.faeterj.tcc.dto.ReturnConsultaPacienteDTO;
 import com.faeterj.tcc.model.Consulta;
@@ -82,6 +81,31 @@ public class ConsultaService
         }
     }
 
+    public void editarConsulta(Long idConsulta, User user, CreateConsultaDTO dto) 
+    {
+        Consulta consulta = consultaRepository.findById(idConsulta)
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada"));
+
+        if (!consulta.getPaciente().getUser().getUserID().equals(user.getUserID())) 
+        {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a editar as consultas deste paciente"); 
+        }
+
+        CreateProfissionalDTO profissionalSaudeDTO = new CreateProfissionalDTO(dto.nomeProfissional(), dto.especialidadeProfissional(), dto.numeroClasseConselho(), dto.estadoProfissional());
+        ProfissionalConsulta profissionalConsulta = profissionalConsultaService.editarProfissionalConsulta(consulta.getProfissionalConsulta().getProfissionalSaudeId(), profissionalSaudeDTO);
+
+        CreateEstabelecimentoDTO estabelecimentoDTO = new CreateEstabelecimentoDTO(dto.nomeEstabelecimento(), dto.cepEstabelecimento(), dto.enderecoEstabelecimento());
+        EstabelecimentoSaude estabelecimentoSaude = estabelecimentoSaudeService.editarEstabelecimento(consulta.getEstabelecimentoSaude().getEstabelecimentoId(), estabelecimentoDTO);
+        
+        consulta.setProfissionalConsulta(profissionalConsulta);
+        consulta.setEstabelecimentoSaude(estabelecimentoSaude);
+        consulta.setMotivoConsulta(dto.motivoConsulta());
+        consulta.setObservacaoConsulta(dto.observacaoConsulta());
+        consulta.setConsultaData(dto.consultaData());
+
+        consultaRepository.save(consulta);
+    }
+
     public ListaConsultasPacienteDTO listarConsultasPaciente(Long idPaciente, int page, int pageSize, User user) 
     {
         Paciente paciente = pacienteService.acharPacientePorId(idPaciente);
@@ -108,28 +132,6 @@ public class ConsultaService
                     pageSize,
                     listaConsultasPacientePage.getTotalPages(),
                     listaConsultasPacientePage.getTotalElements());
-    }
-
-    public void editaConsulta(Long idConsulta, EditConsultaDTO dto, User user) 
-    {
-        Consulta consulta = consultaRepository.findById(idConsulta)
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada"));
-
-        if (!consulta.getPaciente().getUser().getUserID().equals(user.getUserID())) 
-        {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a editar as consultas deste paciente"); 
-        }
-
-        CreateEstabelecimentoDTO estabelecimentoDTO = new CreateEstabelecimentoDTO(dto.nomeEstabelecimento(), dto.cepEstabelecimento(), dto.enderecoEstabelecimento());
-        EstabelecimentoSaude estabelecimentoSaude = estabelecimentoSaudeService.editarEstabelecimento(consulta.getEstabelecimentoSaude().getEstabelecimentoId(), estabelecimentoDTO);
-        
-        consulta.setEstabelecimentoSaude(estabelecimentoSaude);
-        consulta.setMotivoConsulta(dto.motivoConsulta());
-        consulta.setObservacaoConsulta(dto.observacaoConsulta());
-        consulta.setConsultaData(dto.consultaData());
-
-        consultaRepository.save(consulta);
-        
     }
 
     /*public void listarConsultasUser(Long idPaciente, User user) 
