@@ -25,9 +25,7 @@ public class ProfissionalConsultaService
     public ProfissionalConsulta criarProfissionalConsulta(CreateProfissionalDTO dto) {
         // Recuperar ou criar o ProfissionalSaude
         ProfissionalSaude profissionalSaude = profissionalSaudeService.acharProfissionalPorConselhoEstado(dto.numeroClasseConselho(), dto.estadoProfissional())
-                .orElse(profissionalSaudeService.criarProfissional(dto));
-
-        System.out.println("\n\n\nATENCAO AQUI:" + profissionalSaude.getNomeProfissional() + "\n\n\n");
+                                .orElseGet(() -> profissionalSaudeService.criarProfissional(dto));
     
         // Criar uma nova instância de ProfissionalConsulta
         ProfissionalConsulta profissionalConsulta = new ProfissionalConsulta();
