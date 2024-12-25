@@ -90,4 +90,20 @@ public class ConsultaController {
             return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
         }
     }
+
+    @GetMapping("/consultas")
+    public ResponseEntity<?> listaConsultasUser(@RequestParam(value = "page", defaultValue = "0") int page, 
+                                                @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
+                                                JwtAuthenticationToken token) 
+    {
+        try 
+        {
+            User user = userService.acharUserPorId(UUID.fromString(token.getName()));
+            var listaConsultasUser = consultaService.listarConsultasUser(user, page, pageSize);
+            return ResponseEntity.status(HttpStatus.OK).body(listaConsultasUser);
+        } 
+        catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
+        }
+    }
 }

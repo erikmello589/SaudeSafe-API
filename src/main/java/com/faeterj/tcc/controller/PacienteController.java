@@ -68,7 +68,8 @@ public class PacienteController {
     {
         try 
         {
-            var listaPacientes = pacienteService.listarPacientes(page, pageSize, token);
+            User user = userService.acharUserPorId(UUID.fromString(token.getName()));
+            var listaPacientes = pacienteService.listarPacientes(page, pageSize, user);
             return ResponseEntity.status(HttpStatus.OK).body(listaPacientes);
         } 
         catch (ResponseStatusException e) {

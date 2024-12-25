@@ -1,11 +1,9 @@
 package com.faeterj.tcc.service;
 
-import java.util.UUID;
-
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -16,17 +14,14 @@ import com.faeterj.tcc.model.Paciente;
 import com.faeterj.tcc.model.Role;
 import com.faeterj.tcc.model.User;
 import com.faeterj.tcc.repository.PacienteRepository;
-import com.faeterj.tcc.repository.UserRepository;
 
 @Service
 public class PacienteService {
 
     private final PacienteRepository pacienteRepository;
-    private final UserRepository userRepository;
 
-    public PacienteService(PacienteRepository pacienteRepository, UserRepository userRepository) {
+    public PacienteService(PacienteRepository pacienteRepository) {
         this.pacienteRepository = pacienteRepository;
-        this.userRepository = userRepository;
     }
 
     public void criarPaciente(CreatePacienteDTO dto, User user) 
@@ -54,10 +49,8 @@ public class PacienteService {
         }
     }
 
-    public ListaPacientesDTO listarPacientes(int page, int pageSize, JwtAuthenticationToken token) {
-        User user = userRepository.findById(UUID.fromString(token.getName()))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
-
+    public ListaPacientesDTO listarPacientes(int page, int pageSize, User user) 
+    {
         var listaPacientesPage = pacienteRepository.findByUserUserID(user.getUserID(),
                 PageRequest.of(page, pageSize, Sort.Direction.ASC, "dataCriacao"))
                 .map(listaItem -> new ReturnPacienteDTO(

@@ -8,8 +8,8 @@ import org.springframework.web.server.ResponseStatusException;
 import com.faeterj.tcc.dto.CreateConsultaDTO;
 import com.faeterj.tcc.dto.CreateEstabelecimentoDTO;
 import com.faeterj.tcc.dto.CreateProfissionalDTO;
-import com.faeterj.tcc.dto.ListaConsultasPacienteDTO;
-import com.faeterj.tcc.dto.ReturnConsultaPacienteDTO;
+import com.faeterj.tcc.dto.ListaConsultasDTO;
+import com.faeterj.tcc.dto.ReturnConsultaDTO;
 import com.faeterj.tcc.model.Consulta;
 import com.faeterj.tcc.model.EstabelecimentoSaude;
 import com.faeterj.tcc.model.Paciente;
@@ -106,7 +106,7 @@ public class ConsultaService
         consultaRepository.save(consulta);
     }
 
-    public ListaConsultasPacienteDTO listarConsultasPaciente(Long idPaciente, int page, int pageSize, User user) 
+    public ListaConsultasDTO listarConsultasPaciente(Long idPaciente, int page, int pageSize, User user) 
     {
         Paciente paciente = pacienteService.acharPacientePorId(idPaciente);
 
@@ -117,7 +117,7 @@ public class ConsultaService
         
         var listaConsultasPacientePage = consultaRepository.findByPacientePacienteId(idPaciente,
                 PageRequest.of(page, pageSize, Sort.Direction.ASC, "consultaData"))
-                .map(listaItem -> new ReturnConsultaPacienteDTO(
+                .map(listaItem -> new ReturnConsultaDTO(
                         listaItem.getConsultaId(),
                         listaItem.getPaciente(),
                         profissionalConsultaService.profissionalConsultaToDTO(listaItem.getProfissionalConsulta()) ,
@@ -126,7 +126,7 @@ public class ConsultaService
                         listaItem.getObservacaoConsulta(),
                         listaItem.getConsultaData()));
 
-        return new ListaConsultasPacienteDTO(
+        return new ListaConsultasDTO(
                     listaConsultasPacientePage.getContent(),
                     page,
                     pageSize,
@@ -134,19 +134,24 @@ public class ConsultaService
                     listaConsultasPacientePage.getTotalElements());
     }
 
-    /*public void listarConsultasUser(Long idPaciente, User user) 
+    public ListaConsultasDTO listarConsultasUser(User user, int page, int pageSize) 
     {
-        Consulta consulta = consultaRepository.findById(idConsulta)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada"));
+        var listaConsultasUserPage = consultaRepository.findByPacienteUser(user, PageRequest.of(page, pageSize, Sort.Direction.ASC, "consultaData"))
+                .map(listaItem -> new ReturnConsultaDTO(
+                        listaItem.getConsultaId(),
+                        listaItem.getPaciente(),
+                        profissionalConsultaService.profissionalConsultaToDTO(listaItem.getProfissionalConsulta()) ,
+                        listaItem.getEstabelecimentoSaude(),
+                        listaItem.getMotivoConsulta(),
+                        listaItem.getObservacaoConsulta(),
+                        listaItem.getConsultaData()));
 
-        boolean isAdmin = user.getRoles().stream()
-                .anyMatch(role -> role.getName().equalsIgnoreCase(Role.Values.ADMIN.name()));
-
-        if (isAdmin || consulta.getPaciente().getUser().getUserID().equals(user.getUserID())) {
-            consultaRepository.deleteById(idConsulta);
-        } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a deletar este paciente");
-        }
-    }*/
+        return new ListaConsultasDTO(
+                    listaConsultasUserPage.getContent(),
+                    page,
+                    pageSize,
+                    listaConsultasUserPage.getTotalPages(),
+                    listaConsultasUserPage.getTotalElements());
+    }
 
 }
