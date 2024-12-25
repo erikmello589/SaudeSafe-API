@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -55,6 +56,20 @@ public class PacienteController {
             User user = userService.acharUserPorId(UUID.fromString(token.getName()));
             pacienteService.deletarPaciente(idPaciente, user);
             return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Paciente Deletado com sucesso.", 200));
+        } 
+        catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
+        }
+    }
+
+    @PutMapping("/paciente/{id}")
+    public ResponseEntity<RequestResponseDTO> editaPaciente(@PathVariable("id") Long idPaciente, JwtAuthenticationToken token, @RequestBody CreatePacienteDTO dto)
+    {
+        try 
+        {
+            User user = userService.acharUserPorId(UUID.fromString(token.getName()));
+            pacienteService.editarPaciente(idPaciente, user, dto);
+            return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Paciente Editado com sucesso.", 200));
         } 
         catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));

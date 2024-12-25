@@ -49,6 +49,26 @@ public class PacienteService {
         }
     }
 
+    public void editarPaciente(Long idPaciente, User user, CreatePacienteDTO dto) 
+    {
+        Paciente paciente = pacienteRepository.findById(idPaciente)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente não encontrado"));
+
+        boolean isAdmin = user.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase(Role.Values.ADMIN.name()));
+
+        if (isAdmin || paciente.getUser().getUserID().equals(user.getUserID())) 
+        {
+            paciente.setNomePaciente(dto.nomePaciente());
+            paciente.setSobrenomePaciente(dto.sobrenomePaciente());
+            pacienteRepository.save(paciente);
+        } 
+        else 
+        {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a deletar este paciente");
+        }
+    }
+
     public ListaPacientesDTO listarPacientes(int page, int pageSize, User user) 
     {
         var listaPacientesPage = pacienteRepository.findByUserUserID(user.getUserID(),
