@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.faeterj.tcc.dto.CreateProfissionalDTO;
+import com.faeterj.tcc.dto.EditaProfissionalDTO;
 import com.faeterj.tcc.dto.ListaProfissionaisDTO;
 import com.faeterj.tcc.dto.ReturnProfissionalDTO;
-import com.faeterj.tcc.dto.VerificaProfissionalDTO;
 import com.faeterj.tcc.model.ProfissionalSaude;
 import com.faeterj.tcc.model.Role;
 import com.faeterj.tcc.model.StatusEnum;
@@ -32,8 +32,11 @@ public class ProfissionalSaudeService
         this.statusProfissionalRepository = statusProfissionalRepository;
     }
 
-    public ProfissionalSaude criarProfissional(CreateProfissionalDTO dto) 
+    public ProfissionalSaude criarProfissional(CreateProfissionalDTO dto, User user) 
     {
+        boolean isAdmin = user.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase(Role.Values.ADMIN.name()));
+
         ProfissionalSaude profissionalSaude = new ProfissionalSaude();
         profissionalSaude.setNomeProfissional(dto.nomeProfissional());
         profissionalSaude.setEspecialidadeProfissional(dto.especialidadeProfissional());
@@ -45,7 +48,15 @@ public class ProfissionalSaudeService
 
         // Criar o StatusProfissional inicial
         StatusProfissional statusProfissional = new StatusProfissional();
-        statusProfissional.setStatus(StatusEnum.SOB_ANALISE); // Status inicial padrão
+
+        if (isAdmin)
+        {
+            statusProfissional.setStatus(StatusEnum.REGULAR); // Status inicial padrão caso seja criado por um usuario admin
+        }
+        else
+        {
+            statusProfissional.setStatus(StatusEnum.SOB_ANALISE);  // Status inicial padrão caso seja criado por um usuario basico
+        }
         statusProfissional.setProfissionalId(profissionalSaude.getProfissionalSaudeId());
 
         // Salvar o StatusProfissional
@@ -54,7 +65,7 @@ public class ProfissionalSaudeService
         // Vincular o status ao profissional
         profissionalSaude.setStatusId(statusProfissional.getStatusId());
 
-        // Salvar novamente o profissional com o devido status inicial (SOB ANALISE)
+        // Salvar novamente o profissional com o devido status inicial 
         return profissionalSaudeRepository.save(profissionalSaude);
     }
 
@@ -73,7 +84,7 @@ public class ProfissionalSaudeService
         }
     }
 
-    public ProfissionalSaude editarProfissional(Long idProfissional, User user, CreateProfissionalDTO dto) 
+    public ProfissionalSaude editarProfissional(Long idProfissional, User user, EditaProfissionalDTO dto) 
     {
         ProfissionalSaude profissionalSaude = profissionalSaudeRepository.findById(idProfissional)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profissional não encontrado"));
@@ -87,6 +98,21 @@ public class ProfissionalSaudeService
             profissionalSaude.setEspecialidadeProfissional(dto.especialidadeProfissional());
             profissionalSaude.setNumeroClasseConselho(dto.numeroClasseConselho());
             profissionalSaude.setEstadoProfissional(dto.estadoProfissional());
+
+            StatusEnum status;
+            try 
+            {
+                status = StatusEnum.valueOf(dto.statusProfissional().toUpperCase());
+            } 
+            catch (IllegalArgumentException e) 
+            {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status requisitado é inválido.");
+            }
+            StatusProfissional statusProfissional = statusProfissionalRepository.findByProfissionalId(profissionalSaude.getProfissionalSaudeId());
+            statusProfissional.setStatus(status); 
+            statusProfissional = statusProfissionalRepository.save(statusProfissional);
+
+            profissionalSaude.setStatusId(statusProfissional.getStatusId());
             
             // Salvar novamente o profissional com as alterações desejadas
             return profissionalSaudeRepository.save(profissionalSaude);
@@ -128,40 +154,31 @@ public class ProfissionalSaudeService
         return profissionalSaudeRepository.findByNumeroClasseConselhoAndEstadoProfissional(numeroClasseConselho, estadoProfissional);
     }
 
-
-    public void verificarProfissional(User user, VerificaProfissionalDTO dto) 
-    {
-        ProfissionalSaude profissional = profissionalSaudeRepository.findById(dto.idProfissional())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profissional não encontrado"));
-    
-        boolean isAdmin = user.getRoles().stream()
-                .anyMatch(role -> role.getName().equalsIgnoreCase(Role.Values.ADMIN.name()));
-    
-        if (isAdmin) 
-        {
-            StatusEnum status;
-            try 
-            {
-                status = StatusEnum.valueOf(dto.statusSolicitado().toUpperCase());
-            } 
-            catch (IllegalArgumentException e) 
-            {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status requisitado é inválido.");
-            }
-            
-            StatusProfissional statusProfissional = statusProfissionalRepository.findByProfissionalId(profissional.getProfissionalSaudeId());
-            statusProfissional.setStatus(status); 
-            statusProfissional = statusProfissionalRepository.save(statusProfissional);
-        } 
-        else 
-        {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a fazer essa verificação.");
-        }
-    }
-
     public StatusProfissional acharStatusProfissionalPorStatusId(Long statusId) {
         return statusProfissionalRepository.findById(statusId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "StatusProfissional não encontrado"));
+    }
+
+    public ReturnProfissionalDTO profissionalSaudeToDTO(ProfissionalSaude profissional)
+    {
+        ReturnProfissionalDTO profissionalConsultaDTO = new ReturnProfissionalDTO(profissional.getProfissionalSaudeId(),
+            profissional.getNomeProfissional(),    
+            profissional.getEspecialidadeProfissional(), 
+            profissional.getNumeroClasseConselho(), 
+            profissional.getEstadoProfissional(), 
+            acharStatusProfissionalPorStatusId(profissional.getStatusId()), 
+            profissional.getProfissionalDataCriacao());
+        
+        return profissionalConsultaDTO;
+    }
+
+    public ReturnProfissionalDTO buscarProfissionalDTOPorConselhoEstado(String numeroClasseConselho, String estadoProfissional) {
+        
+        ProfissionalSaude profissional = acharProfissionalPorConselhoEstado(numeroClasseConselho, estadoProfissional)
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profissional não encontrado"));
+    
+        // Converte para DTO e retorna
+        return profissionalSaudeToDTO(profissional);
     }
     
 

@@ -8,6 +8,7 @@ import com.faeterj.tcc.dto.CreateProfissionalDTO;
 import com.faeterj.tcc.dto.ReturnProfissionalDTO;
 import com.faeterj.tcc.model.ProfissionalConsulta;
 import com.faeterj.tcc.model.ProfissionalSaude;
+import com.faeterj.tcc.model.User;
 import com.faeterj.tcc.repository.ProfissionalConsultaRepository;
 
 @Service
@@ -22,10 +23,10 @@ public class ProfissionalConsultaService
         this.profissionalSaudeService = profissionalSaudeService;
     }
 
-    public ProfissionalConsulta criarProfissionalConsulta(CreateProfissionalDTO dto) {
+    public ProfissionalConsulta criarProfissionalConsulta(CreateProfissionalDTO dto, User user) {
         // Recuperar ou criar o ProfissionalSaude
         ProfissionalSaude profissionalSaude = profissionalSaudeService.acharProfissionalPorConselhoEstado(dto.numeroClasseConselho(), dto.estadoProfissional())
-                                .orElseGet(() -> profissionalSaudeService.criarProfissional(dto));
+                                .orElseGet(() -> profissionalSaudeService.criarProfissional(dto, user));
     
         // Criar uma nova instância de ProfissionalConsulta
         ProfissionalConsulta profissionalConsulta = new ProfissionalConsulta();
@@ -64,14 +65,14 @@ public class ProfissionalConsultaService
         return profissionalConsultaDTO;
     }
 
-    public ProfissionalConsulta editarProfissionalConsulta(Long idProfissional, CreateProfissionalDTO dto)
+    public ProfissionalConsulta editarProfissionalConsulta(Long idProfissional, CreateProfissionalDTO dto, User user)
     {
         ProfissionalConsulta profissionalConsulta = profissionalConsultaRepository.findById(idProfissional)
                             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profissional desta Consulta não foi encontrado"));
 
         // achar ou criar o ProfissionalSaude
         ProfissionalSaude profissionalSaude = profissionalSaudeService.acharProfissionalPorConselhoEstado(dto.numeroClasseConselho(), dto.estadoProfissional())
-                                .orElseGet(() -> profissionalSaudeService.criarProfissional(dto));
+                                .orElseGet(() -> profissionalSaudeService.criarProfissional(dto, user));
 
         profissionalConsulta.setNomeProfissional(dto.nomeProfissional());
         profissionalConsulta.setEspecialidadeProfissional(dto.especialidadeProfissional());

@@ -40,9 +40,10 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(authorize -> authorize
             .requestMatchers(HttpMethod.POST,  "/login").permitAll()
-            .requestMatchers(HttpMethod.POST,  "/register").permitAll()
+            .requestMatchers(HttpMethod.POST,  "/cadastrar").permitAll()
             .requestMatchers(HttpMethod.POST,  "/esqueci-minha-senha").permitAll()
             .requestMatchers(HttpMethod.POST,  "/redefinicao-senha").permitAll()
+            .requestMatchers(HttpMethod.GET,  "/profissional").permitAll()
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html").permitAll()
             .anyRequest().authenticated())
             .csrf(csrf -> csrf.disable())

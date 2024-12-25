@@ -16,10 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-
 import com.faeterj.tcc.dto.CreateProfissionalDTO;
+import com.faeterj.tcc.dto.EditaProfissionalDTO;
 import com.faeterj.tcc.dto.RequestResponseDTO;
-import com.faeterj.tcc.dto.VerificaProfissionalDTO;
 import com.faeterj.tcc.model.User;
 import com.faeterj.tcc.service.ProfissionalSaudeService;
 import com.faeterj.tcc.service.UserService;
@@ -58,7 +57,8 @@ public class ProfissionalSaudeController {
     {
         try 
         {
-            profissionalSaudeService.criarProfissional(dto);
+            User user = userService.acharUserPorId(UUID.fromString(token.getName()));
+            profissionalSaudeService.criarProfissional(dto, user);
             return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Profissional criado com sucesso.", 200));
         } 
         catch (ResponseStatusException e) {
@@ -68,7 +68,7 @@ public class ProfissionalSaudeController {
 
     @PutMapping("/profissional/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<RequestResponseDTO> editaProfissional(@PathVariable("id") Long idProfissional, @RequestBody CreateProfissionalDTO dto, JwtAuthenticationToken token) 
+    public ResponseEntity<RequestResponseDTO> editaProfissional(@PathVariable("id") Long idProfissional, @RequestBody EditaProfissionalDTO dto, JwtAuthenticationToken token) 
     {
         try 
         {
@@ -96,18 +96,18 @@ public class ProfissionalSaudeController {
         }
     }
 
-    @PostMapping("/verificar-profissional")
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<RequestResponseDTO> verificaProfissional(@RequestBody VerificaProfissionalDTO dto, JwtAuthenticationToken token) 
+    @GetMapping("/profissional")
+    public ResponseEntity<?> buscaProfissionalPorNumeroConselho(@RequestParam String numeroClasseConselho, @RequestParam String estado) 
     {
         try 
         {
-            User user = userService.acharUserPorId(UUID.fromString(token.getName()));
-            profissionalSaudeService.verificarProfissional(user, dto);
-            return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Processo de verificação completo com êxito.", 200));
+            var profissional = profissionalSaudeService.buscarProfissionalDTOPorConselhoEstado(numeroClasseConselho, estado);
+            return ResponseEntity.status(HttpStatus.OK).body(profissional);
         } 
-        catch (ResponseStatusException e) {
+        catch (ResponseStatusException e) 
+        {
             return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
         }
     }
+
 }

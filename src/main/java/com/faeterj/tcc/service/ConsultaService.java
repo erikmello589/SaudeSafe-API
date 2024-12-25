@@ -44,7 +44,7 @@ public class ConsultaService
         }
 
         CreateProfissionalDTO profissionalSaudeDTO = new CreateProfissionalDTO(dto.nomeProfissional(), dto.especialidadeProfissional(), dto.numeroClasseConselho(), dto.estadoProfissional());
-        ProfissionalConsulta profissionalConsulta = profissionalConsultaService.criarProfissionalConsulta(profissionalSaudeDTO);
+        ProfissionalConsulta profissionalConsulta = profissionalConsultaService.criarProfissionalConsulta(profissionalSaudeDTO, user);
 
         CreateEstabelecimentoDTO estabelecimentoDTO = new CreateEstabelecimentoDTO(dto.nomeEstabelecimento(), dto.cepEstabelecimento(), dto.enderecoEstabelecimento());
         EstabelecimentoSaude estabelecimentoSaude = estabelecimentoSaudeService.criarEstabelecimento(estabelecimentoDTO);
@@ -92,7 +92,7 @@ public class ConsultaService
         }
 
         CreateProfissionalDTO profissionalSaudeDTO = new CreateProfissionalDTO(dto.nomeProfissional(), dto.especialidadeProfissional(), dto.numeroClasseConselho(), dto.estadoProfissional());
-        ProfissionalConsulta profissionalConsulta = profissionalConsultaService.editarProfissionalConsulta(consulta.getProfissionalConsulta().getProfissionalSaudeId(), profissionalSaudeDTO);
+        ProfissionalConsulta profissionalConsulta = profissionalConsultaService.editarProfissionalConsulta(consulta.getProfissionalConsulta().getProfissionalSaudeId(), profissionalSaudeDTO, user);
 
         CreateEstabelecimentoDTO estabelecimentoDTO = new CreateEstabelecimentoDTO(dto.nomeEstabelecimento(), dto.cepEstabelecimento(), dto.enderecoEstabelecimento());
         EstabelecimentoSaude estabelecimentoSaude = estabelecimentoSaudeService.editarEstabelecimento(consulta.getEstabelecimentoSaude().getEstabelecimentoId(), estabelecimentoDTO);
