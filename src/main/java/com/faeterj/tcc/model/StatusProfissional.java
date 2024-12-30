@@ -22,6 +22,7 @@ public class StatusProfissional {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "status_id")
+    @JsonIgnore
     private Long statusId;
 
     @Column(name = "profissional_id")

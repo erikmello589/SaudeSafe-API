@@ -17,6 +17,7 @@ import com.faeterj.tcc.model.Role;
 import com.faeterj.tcc.model.StatusEnum;
 import com.faeterj.tcc.model.StatusProfissional;
 import com.faeterj.tcc.model.User;
+import com.faeterj.tcc.repository.ProfissionalConsultaRepository;
 import com.faeterj.tcc.repository.ProfissionalSaudeRepository;
 import com.faeterj.tcc.repository.StatusProfissionalRepository;
 
@@ -25,11 +26,14 @@ public class ProfissionalSaudeService
 {
     private final ProfissionalSaudeRepository profissionalSaudeRepository;
     private final StatusProfissionalRepository statusProfissionalRepository;
+    private final ProfissionalConsultaRepository profissionalConsultaRepository;
 
     public ProfissionalSaudeService(ProfissionalSaudeRepository profissionalSaudeRepository,
-            StatusProfissionalRepository statusProfissionalRepository) {
+            StatusProfissionalRepository statusProfissionalRepository,
+            ProfissionalConsultaRepository profissionalConsultaRepository) {
         this.profissionalSaudeRepository = profissionalSaudeRepository;
         this.statusProfissionalRepository = statusProfissionalRepository;
+        this.profissionalConsultaRepository = profissionalConsultaRepository;
     }
 
     public ProfissionalSaude criarProfissional(CreateProfissionalDTO dto, User user) 
@@ -106,7 +110,7 @@ public class ProfissionalSaudeService
             } 
             catch (IllegalArgumentException e) 
             {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status requisitado é inválido.");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O Status de Profissional enviado é inválido.");
             }
             StatusProfissional statusProfissional = statusProfissionalRepository.findByProfissionalId(profissionalSaude.getProfissionalSaudeId());
             statusProfissional.setStatus(status); 
@@ -114,8 +118,13 @@ public class ProfissionalSaudeService
 
             profissionalSaude.setStatusId(statusProfissional.getStatusId());
             
-            // Salvar novamente o profissional com as alterações desejadas
-            return profissionalSaudeRepository.save(profissionalSaude);
+            profissionalSaude = profissionalSaudeRepository.save(profissionalSaude);
+
+            //altera todos os ProfissionalConsulta que tiverem o mesmo CRM que o que eu estou editando
+            profissionalConsultaRepository.atualizaCrmProfissionaisConsulta(profissionalSaude.getNomeProfissional(), profissionalSaude.getEspecialidadeProfissional(), profissionalSaude.getNumeroClasseConselho(), profissionalSaude.getEstadoProfissional(), profissionalSaude.getStatusId());
+
+            //retorna o profissional com as alterações desejadas
+            return profissionalSaude;
         }
         else
         {

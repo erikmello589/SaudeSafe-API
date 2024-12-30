@@ -85,4 +85,9 @@ public class ProfissionalConsultaService
         // Salvar a nova entidade ProfissionalConsulta
         return profissionalConsultaRepository.save(profissionalConsulta);
     }
+
+    public int editarProfissionaisConsultaPorStatusId(Long statusId, String nomeProfissional, String especialidadeProfissional, String numeroClasseConselho, String estadoProfissional)
+    {
+        return profissionalConsultaRepository.atualizaCrmProfissionaisConsulta(nomeProfissional, especialidadeProfissional, numeroClasseConselho, estadoProfissional, statusId);
+    }
 }
