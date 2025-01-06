@@ -1,5 +1,6 @@
 package com.faeterj.tcc.controller;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -13,11 +14,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.faeterj.tcc.dto.CreateAtestadoDTO;
 import com.faeterj.tcc.dto.CreateConsultaDTO;
 import com.faeterj.tcc.dto.RequestResponseDTO;
 import com.faeterj.tcc.model.User;
+import com.faeterj.tcc.service.AtestadoService;
 import com.faeterj.tcc.service.ConsultaService;
 import com.faeterj.tcc.service.UserService;
 
@@ -26,10 +30,13 @@ public class ConsultaController {
 
     private final ConsultaService consultaService;
     private final UserService userService;
+    private final AtestadoService atestadoService;
 
-    public ConsultaController(ConsultaService consultaService, UserService userService) {
+    public ConsultaController(ConsultaService consultaService, UserService userService,
+            AtestadoService atestadoService) {
         this.consultaService = consultaService;
         this.userService = userService;
+        this.atestadoService = atestadoService;
     }
 
     @PostMapping("/consulta")
@@ -106,4 +113,23 @@ public class ConsultaController {
             return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
         }
     }
+
+    @PostMapping("/consulta/criarAtestado/{idConsulta}")
+    public ResponseEntity<RequestResponseDTO> criarAtestado(
+            @PathVariable("idConsulta") Long idConsulta, 
+            @RequestParam(value = "periodoAfastamento") String periodoAfastamento,
+            @RequestParam(value = "observacaoAtestado") String observacaoAtestado,
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            JwtAuthenticationToken token) throws IOException {
+        try {
+            User user = userService.acharUserPorId(UUID.fromString(token.getName()));
+            CreateAtestadoDTO dto = new CreateAtestadoDTO(periodoAfastamento, observacaoAtestado);  // Simulando a criação do DTO com os parâmetros
+            atestadoService.criarAtestado(idConsulta, dto, file, user);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new RequestResponseDTO("Atestado criado com sucesso.", 201));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
+        }
+    }
+    
+        
 }

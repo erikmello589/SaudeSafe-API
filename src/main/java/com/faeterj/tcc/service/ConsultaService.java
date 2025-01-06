@@ -154,4 +154,9 @@ public class ConsultaService
                     listaConsultasUserPage.getTotalElements());
     }
 
+    public Consulta acharConsultaPorId(Long idConsulta) {
+        return consultaRepository.findById(idConsulta)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada"));
+    }
+
 }
