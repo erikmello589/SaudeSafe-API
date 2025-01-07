@@ -118,7 +118,7 @@ public class ConsultaController {
     public ResponseEntity<RequestResponseDTO> criarAtestado(
             @PathVariable("idConsulta") Long idConsulta, 
             @RequestParam(value = "periodoAfastamento") String periodoAfastamento,
-            @RequestParam(value = "observacaoAtestado") String observacaoAtestado,
+            @RequestParam(value = "observacaoAtestado", required = false) String observacaoAtestado,
             @RequestParam(value = "file", required = false) MultipartFile file,
             JwtAuthenticationToken token) throws IOException {
         try {
@@ -126,6 +126,36 @@ public class ConsultaController {
             CreateAtestadoDTO dto = new CreateAtestadoDTO(periodoAfastamento, observacaoAtestado);  // Simulando a criação do DTO com os parâmetros
             atestadoService.criarAtestado(idConsulta, dto, file, user);
             return ResponseEntity.status(HttpStatus.CREATED).body(new RequestResponseDTO("Atestado criado com sucesso.", 201));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
+        }
+    }
+
+    @PutMapping("/consulta/editarAtestado/{idConsulta}")
+    public ResponseEntity<RequestResponseDTO> editarAtestado(
+            @PathVariable("idConsulta") Long idConsulta, 
+            @RequestParam(value = "periodoAfastamento") String periodoAfastamento,
+            @RequestParam(value = "observacaoAtestado", required = false) String observacaoAtestado,
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            JwtAuthenticationToken token) throws IOException {
+        try {
+            User user = userService.acharUserPorId(UUID.fromString(token.getName()));
+            CreateAtestadoDTO dto = new CreateAtestadoDTO(periodoAfastamento, observacaoAtestado);  // Simulando a criação do DTO com os parâmetros
+            atestadoService.editarAtestado(idConsulta, dto, file, user);
+            return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Atestado editado com sucesso.", 200));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
+        }
+    }
+
+    @DeleteMapping("/consulta/excluirAtestado/{idConsulta}")
+    public ResponseEntity<RequestResponseDTO> excluirAtestado(@PathVariable("idConsulta") Long idConsulta, JwtAuthenticationToken token) 
+    {
+        try 
+        {
+            User user = userService.acharUserPorId(UUID.fromString(token.getName()));
+            atestadoService.excluirAtestado(idConsulta, user);
+            return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Atestado excluido com sucesso.", 200));
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
         }
