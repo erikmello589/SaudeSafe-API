@@ -10,6 +10,8 @@ import com.faeterj.tcc.model.Receita;
 import com.faeterj.tcc.model.ReceitaMedicamento;
 import com.faeterj.tcc.repository.ReceitaMedicamentoRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class ReceitaMedicamentoService 
 {
@@ -37,5 +39,11 @@ public class ReceitaMedicamentoService
         }
 
         return listaMedicamentos;
+    }
+
+    @Transactional
+    public void ApagarMedicamentosDaReceita(Long receitaId) 
+    {
+        receitaMedicamentoRepository.deleteByReceitaReceitaId(receitaId);
     }
 }

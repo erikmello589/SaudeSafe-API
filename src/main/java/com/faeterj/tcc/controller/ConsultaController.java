@@ -179,12 +179,12 @@ public class ConsultaController {
     @PutMapping("/editarReceita/consulta/{idConsulta}")
     public ResponseEntity<RequestResponseDTO> editarReceita(
             @PathVariable("idConsulta") Long idConsulta, 
-            @RequestBody String observacaoReceita,
+            @RequestPart CreateReceitaDTO dto,
             @RequestParam(value = "file", required = false) MultipartFile file,
             JwtAuthenticationToken token) throws IOException {
         try {
             User user = userService.acharUserPorId(UUID.fromString(token.getName()));            
-            receitaService.editarReceita(idConsulta, observacaoReceita, file, user);
+            receitaService.editarReceita(idConsulta, dto, file, user);
             return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Atestado editado com sucesso.", 200));
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));

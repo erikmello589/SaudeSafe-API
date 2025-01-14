@@ -70,7 +70,7 @@ public class ReceitaService
         return receitaRepository.save(receita);
     }
 
-    public Receita editarReceita(Long idConsulta, String observacaoReceita, MultipartFile file, User user) throws IOException 
+    public Receita editarReceita(Long idConsulta, CreateReceitaDTO createReceitaDTO, MultipartFile file, User user) throws IOException 
     {
         // Busca a consulta associada
         Consulta consulta = consultaService.acharConsultaPorId(idConsulta);
@@ -84,7 +84,7 @@ public class ReceitaService
         Receita receita = receitaRepository.findByConsultaConsultaId(idConsulta)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Não há receita anexada a essa consulta."));
 
-        receita.setObservacaoReceita(observacaoReceita);
+        receita.setObservacaoReceita(createReceitaDTO.observacaoReceita());
         
         if (!file.isEmpty()) 
         {
@@ -103,6 +103,11 @@ public class ReceitaService
             // Converter arquivo para byte[] e salvar no Atestado
             receita.setPdfAnexado(file.getBytes());
         }
+
+        receitaMedicamentoService.ApagarMedicamentosDaReceita(receita.getReceitaId());
+
+        receita = receitaRepository.save(receita);
+        receita.setMedicamentos(receitaMedicamentoService.converterListaDTOparaListaEntidade(createReceitaDTO.medicamentos(), receita));
 
         return receitaRepository.save(receita);
     }
