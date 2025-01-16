@@ -34,9 +34,9 @@ public class ConsultaService
         this.consultaRepository = consultaRepository;
     }
 
-    public void criarConsulta(CreateConsultaDTO dto, User user) 
+    public void criarConsulta(Long idPaciente, CreateConsultaDTO dto, User user) 
     {
-        Paciente paciente = pacienteService.acharPacientePorId(dto.pacienteId());
+        Paciente paciente = pacienteService.acharPacientePorId(idPaciente);
 
         if (!paciente.getUser().getUserID().equals(user.getUserID())) 
         {

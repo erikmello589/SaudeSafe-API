@@ -44,13 +44,13 @@ public class ConsultaController {
         this.receitaService = receitaService;
     }
 
-    @PostMapping("/consulta")
-    public ResponseEntity<RequestResponseDTO> criarConsulta(@RequestBody CreateConsultaDTO dto, JwtAuthenticationToken token) 
+    @PostMapping("/consulta/paciente/{idPaciente}")
+    public ResponseEntity<RequestResponseDTO> criarConsulta(@PathVariable("idPaciente") Long idPaciente, @RequestBody CreateConsultaDTO dto, JwtAuthenticationToken token) 
     {
         try 
         {
             User user = userService.acharUserPorId(UUID.fromString(token.getName()));
-            consultaService.criarConsulta(dto, user);
+            consultaService.criarConsulta(idPaciente, dto, user);
             return ResponseEntity.status(HttpStatus.CREATED).body(new RequestResponseDTO("Consulta criada com sucesso.", 201));
         } 
         catch (ResponseStatusException e) {
@@ -73,7 +73,7 @@ public class ConsultaController {
     }
 
     @PutMapping("/consulta/{id}")
-    public ResponseEntity<RequestResponseDTO> editaConsulta(@PathVariable("id") Long idConsulta, @RequestBody CreateConsultaDTO dto, JwtAuthenticationToken token) 
+    public ResponseEntity<RequestResponseDTO> editarConsulta(@PathVariable("id") Long idConsulta, @RequestBody CreateConsultaDTO dto, JwtAuthenticationToken token) 
     {
         try 
         {
@@ -141,7 +141,8 @@ public class ConsultaController {
             @RequestParam(value = "file", required = false) MultipartFile file,
             JwtAuthenticationToken token) throws IOException {
         try {
-            User user = userService.acharUserPorId(UUID.fromString(token.getName()));            atestadoService.editarAtestado(idConsulta, dto, file, user);
+            User user = userService.acharUserPorId(UUID.fromString(token.getName()));            
+            atestadoService.editarAtestado(idConsulta, dto, file, user);
             return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Atestado editado com sucesso.", 200));
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
@@ -185,7 +186,7 @@ public class ConsultaController {
         try {
             User user = userService.acharUserPorId(UUID.fromString(token.getName()));            
             receitaService.editarReceita(idConsulta, dto, file, user);
-            return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Atestado editado com sucesso.", 200));
+            return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Receita editada com sucesso.", 200));
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
         }
@@ -198,7 +199,7 @@ public class ConsultaController {
         {
             User user = userService.acharUserPorId(UUID.fromString(token.getName()));
             receitaService.excluirReceita(idConsulta, user);
-            return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Atestado excluido com sucesso.", 200));
+            return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Receita excluida com sucesso.", 200));
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
         }
