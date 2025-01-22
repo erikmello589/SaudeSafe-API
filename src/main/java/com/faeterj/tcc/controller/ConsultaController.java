@@ -20,11 +20,13 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.faeterj.tcc.dto.CreateAtestadoDTO;
 import com.faeterj.tcc.dto.CreateConsultaDTO;
+import com.faeterj.tcc.dto.CreatePedidoExameDTO;
 import com.faeterj.tcc.dto.CreateReceitaDTO;
 import com.faeterj.tcc.dto.RequestResponseDTO;
 import com.faeterj.tcc.model.User;
 import com.faeterj.tcc.service.AtestadoService;
 import com.faeterj.tcc.service.ConsultaService;
+import com.faeterj.tcc.service.PedidoExameService;
 import com.faeterj.tcc.service.ReceitaService;
 import com.faeterj.tcc.service.UserService;
 
@@ -35,13 +37,15 @@ public class ConsultaController {
     private final UserService userService;
     private final AtestadoService atestadoService;
     private final ReceitaService receitaService;
+    private final PedidoExameService pedidoExameService;
 
     public ConsultaController(ConsultaService consultaService, UserService userService, AtestadoService atestadoService,
-            ReceitaService receitaService) {
+            ReceitaService receitaService, PedidoExameService pedidoExameService) {
         this.consultaService = consultaService;
         this.userService = userService;
         this.atestadoService = atestadoService;
         this.receitaService = receitaService;
+        this.pedidoExameService = pedidoExameService;
     }
 
     @PostMapping("/consulta/paciente/{idPaciente}")
@@ -205,5 +209,46 @@ public class ConsultaController {
         }
     }
     
-        
+    @PostMapping("/criarPedidoExame/consulta/{idConsulta}")
+    public ResponseEntity<RequestResponseDTO> criarPedidoExamEntity(
+            @PathVariable("idConsulta") Long idConsulta, 
+            @RequestPart CreatePedidoExameDTO dto,
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            JwtAuthenticationToken token) throws IOException {
+        try {
+            User user = userService.acharUserPorId(UUID.fromString(token.getName()));
+            pedidoExameService.criarPedidoExame(idConsulta, dto, file, user);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new RequestResponseDTO("Pedido de Exame criado com sucesso.", 201));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
+        }
+    }
+
+    @PutMapping("/editarPedidoExame/consulta/{idConsulta}")
+    public ResponseEntity<RequestResponseDTO> editarReceita(
+            @PathVariable("idConsulta") Long idConsulta, 
+            @RequestPart CreatePedidoExameDTO dto,
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            JwtAuthenticationToken token) throws IOException {
+        try {
+            User user = userService.acharUserPorId(UUID.fromString(token.getName()));            
+            pedidoExameService.editarPedidoExame(idConsulta, dto, file, user);
+            return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Pedido de Exame editado com sucesso.", 200));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
+        }
+    }
+
+    @DeleteMapping("/excluirPedidoExame/consulta/{idConsulta}")
+    public ResponseEntity<RequestResponseDTO> excluirPedidoExame(@PathVariable("idConsulta") Long idConsulta, JwtAuthenticationToken token) 
+    {
+        try 
+        {
+            User user = userService.acharUserPorId(UUID.fromString(token.getName()));
+            pedidoExameService.excluirPedidoExame(idConsulta, user);
+            return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Pedido excluido com sucesso.", 200));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
+        }
+    }
 }
