@@ -11,6 +11,7 @@ import com.faeterj.tcc.dto.CreateReceitaDTO;
 import com.faeterj.tcc.model.Consulta;
 import com.faeterj.tcc.model.Receita;
 import com.faeterj.tcc.model.User;
+import com.faeterj.tcc.repository.ConsultaRepository;
 import com.faeterj.tcc.repository.ReceitaRepository;
 
 @Service
@@ -18,19 +19,20 @@ public class ReceitaService
 {
     private final ReceitaRepository receitaRepository;
     private final ReceitaMedicamentoService receitaMedicamentoService;
-    private final ConsultaService consultaService;
+    private final ConsultaRepository consultaRepository;
 
     public ReceitaService(ReceitaRepository receitaRepository, ReceitaMedicamentoService receitaMedicamentoService,
-            ConsultaService consultaService) {
+            ConsultaRepository consultaRepository) {
         this.receitaRepository = receitaRepository;
         this.receitaMedicamentoService = receitaMedicamentoService;
-        this.consultaService = consultaService;
+        this.consultaRepository = consultaRepository;
     }
 
     public Receita criarReceita(Long idConsulta, CreateReceitaDTO createReceitaDTO, MultipartFile file, User user) throws IOException 
     {
         // Busca a consulta associada
-        Consulta consulta = consultaService.acharConsultaPorId(idConsulta);
+        Consulta consulta = consultaRepository.findById(idConsulta)
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada"));
 
         if (!consulta.getPaciente().getUser().getUserID().equals(user.getUserID())) 
         {
@@ -73,7 +75,8 @@ public class ReceitaService
     public Receita editarReceita(Long idConsulta, CreateReceitaDTO createReceitaDTO, MultipartFile file, User user) throws IOException 
     {
         // Busca a consulta associada
-        Consulta consulta = consultaService.acharConsultaPorId(idConsulta);
+        Consulta consulta = consultaRepository.findById(idConsulta)
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada"));
 
         if (!consulta.getPaciente().getUser().getUserID().equals(user.getUserID())) 
         {
@@ -112,22 +115,23 @@ public class ReceitaService
         return receitaRepository.save(receita);
     }
 
-    public void excluirReceita(Long idConsulta, User user)
+    public void excluirReceita(Long idConsulta, User user) 
     {
         // Busca a consulta associada
-        Consulta consulta = consultaService.acharConsultaPorId(idConsulta);
-
-        if (!consulta.getPaciente().getUser().getUserID().equals(user.getUserID())) 
-        {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a modificar essa consulta."); 
+        Consulta consulta = consultaRepository.findById(idConsulta)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada"));
+    
+        if (!consulta.getPaciente().getUser().getUserID().equals(user.getUserID())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a modificar essa consulta.");
         }
-
-        // Criação do objeto Receita a partir do DTO
-        Receita receita = receitaRepository.findByConsultaConsultaId(idConsulta)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Não há receita anexada a essa consulta."));
-        
-        receitaRepository.deleteById(receita.getReceitaId());
+    
+        receitaRepository.findByConsultaConsultaId(idConsulta)
+                .ifPresent(receita -> {
+                    receitaMedicamentoService.ApagarMedicamentosDaReceita(receita.getReceitaId());
+                    receitaRepository.deleteById(receita.getReceitaId());
+                });
     }
+    
 
     private boolean isValidFileType(String contentType) {
         return contentType.equals("application/pdf") ||

@@ -86,8 +86,17 @@ public class ProfissionalConsultaService
         return profissionalConsultaRepository.save(profissionalConsulta);
     }
 
+    public void excluirProfissionalConsulta(Long idProfissional) 
+    {
+        ProfissionalConsulta profissionalConsulta = profissionalConsultaRepository.findById(idProfissional)
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profissional desta Consulta não foi encontrado"));
+
+        profissionalConsultaRepository.delete(profissionalConsulta);
+    }
+
     public int editarProfissionaisConsultaPorStatusId(Long statusId, String nomeProfissional, String especialidadeProfissional, String numeroClasseConselho, String estadoProfissional)
     {
         return profissionalConsultaRepository.atualizaCrmProfissionaisConsulta(nomeProfissional, especialidadeProfissional, numeroClasseConselho, estadoProfissional, statusId);
     }
+
 }
