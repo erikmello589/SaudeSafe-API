@@ -58,6 +58,7 @@ public class AtestadoService {
 
             // Converter arquivo para byte[] e salvar no Atestado
             atestado.setPdfAnexado(file.getBytes());
+            atestado.setTemAnexo(true);
         } 
         else 
         {
@@ -101,6 +102,7 @@ public class AtestadoService {
 
             // Converter arquivo para byte[] e salvar no Atestado
             atestado.setPdfAnexado(file.getBytes());
+            atestado.setTemAnexo(true);
         }
 
         return atestadoRepository.save(atestado);

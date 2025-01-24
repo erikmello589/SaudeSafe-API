@@ -17,6 +17,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "tb_pedido_exames")
@@ -31,6 +32,9 @@ public class PedidoExame
     @JoinColumn(name = "consulta_id")
     @JsonIgnore
     private Consulta consulta;
+
+    @NotNull
+    private boolean temAnexo = false;
 
     private byte[] pdfAnexado;
 
@@ -56,6 +60,14 @@ public class PedidoExame
 
     public void setConsulta(Consulta consulta) {
         this.consulta = consulta;
+    }
+
+    public boolean getTemAnexo() {
+        return temAnexo;
+    }
+
+    public void setTemAnexo(boolean temAnexo) {
+        this.temAnexo = temAnexo;
     }
 
     public byte[] getPdfAnexado() {

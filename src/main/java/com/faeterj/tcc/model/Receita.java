@@ -17,6 +17,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "tb_receitas")
@@ -36,6 +37,9 @@ public class Receita
     private List<ReceitaMedicamento> medicamentos;
    
     private String observacaoReceita;
+
+    @NotNull
+    private boolean temAnexo = false;
 
     private byte[] pdfAnexado;
 
@@ -72,6 +76,14 @@ public class Receita
 
     public void setObservacaoReceita(String observacaoReceita) {
         this.observacaoReceita = observacaoReceita;
+    }
+
+    public boolean getTemAnexo() {
+        return temAnexo;
+    }
+
+    public void setTemAnexo(boolean temAnexo) {
+        this.temAnexo = temAnexo;
     }
 
     public byte[] getPdfAnexado() {

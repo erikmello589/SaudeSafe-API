@@ -60,6 +60,7 @@ public class ReceitaService
 
             // Converter arquivo para byte[] e salvar na receita
             receita.setPdfAnexado(file.getBytes());
+            receita.setTemAnexo(true);
         } 
         else 
         {
@@ -105,6 +106,7 @@ public class ReceitaService
 
             // Converter arquivo para byte[] e salvar no Atestado
             receita.setPdfAnexado(file.getBytes());
+            receita.setTemAnexo(true);
         }
 
         receitaMedicamentoService.ApagarMedicamentosDaReceita(receita.getReceitaId());

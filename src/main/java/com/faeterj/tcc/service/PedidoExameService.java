@@ -59,6 +59,7 @@ public class PedidoExameService
 
             // Converter arquivo para byte[] e salvar na receita
             pedidoExame.setPdfAnexado(file.getBytes());
+            pedidoExame.setTemAnexo(true);
         } 
         else 
         {
@@ -103,6 +104,7 @@ public class PedidoExameService
 
             // Converter arquivo para byte[] e salvar no Atestado
             pedidoExame.setPdfAnexado(file.getBytes());
+            pedidoExame.setTemAnexo(true);
         }
 
         exameService.ApagarExamesDoPedido(pedidoExame.getPedidoExameId());
