@@ -1,6 +1,7 @@
 package com.faeterj.tcc.service;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -130,6 +131,11 @@ public class PedidoExameService
                     exameService.ApagarExamesDoPedido(pedidoExame.getPedidoExameId());
                     pedidoExameRepository.deleteById(pedidoExame.getPedidoExameId());
                 });
+    }
+
+    public Optional<PedidoExame> buscarPedidoExame(Long idConsulta)
+    {
+        return pedidoExameRepository.findByConsultaConsultaId(idConsulta);
     }
 
     private boolean isValidFileType(String contentType) {

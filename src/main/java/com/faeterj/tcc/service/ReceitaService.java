@@ -1,6 +1,7 @@
 package com.faeterj.tcc.service;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -132,6 +133,11 @@ public class ReceitaService
                     receitaMedicamentoService.ApagarMedicamentosDaReceita(receita.getReceitaId());
                     receitaRepository.deleteById(receita.getReceitaId());
                 });
+    }
+
+    public Optional<Receita> buscarReceita(Long idConsulta)
+    {
+        return receitaRepository.findByConsultaConsultaId(idConsulta);
     }
     
 

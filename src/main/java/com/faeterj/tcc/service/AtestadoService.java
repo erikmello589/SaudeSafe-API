@@ -1,6 +1,7 @@
 package com.faeterj.tcc.service;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -123,6 +124,11 @@ public class AtestadoService {
                 .ifPresent(atestado -> {
                     atestadoRepository.deleteById(atestado.getAtestadoId());
                 });
+    }
+
+    public Optional<Atestado> buscarAtestado(Long idConsulta)
+    {
+        return atestadoRepository.findByConsultaConsultaId(idConsulta);
     }
 
     private boolean isValidFileType(String contentType) {

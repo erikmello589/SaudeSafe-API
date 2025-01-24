@@ -1,4 +1,5 @@
 package com.faeterj.tcc.service;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import com.faeterj.tcc.dto.CreateConsultaDTO;
 import com.faeterj.tcc.dto.CreateEstabelecimentoDTO;
 import com.faeterj.tcc.dto.CreateProfissionalDTO;
 import com.faeterj.tcc.dto.ListaConsultasDTO;
+import com.faeterj.tcc.dto.ReturnConsultaCompletaDTO;
 import com.faeterj.tcc.dto.ReturnConsultaDTO;
 import com.faeterj.tcc.model.Consulta;
 import com.faeterj.tcc.model.EstabelecimentoSaude;
@@ -175,9 +177,28 @@ public class ConsultaService
                     listaConsultasUserPage.getTotalElements());
     }
 
-    public Consulta acharConsultaPorId(Long idConsulta) {
-        return consultaRepository.findById(idConsulta)
+    public ReturnConsultaCompletaDTO acharConsultaPorId(Long idConsulta, User user) 
+    {
+        Consulta consulta = consultaRepository.findById(idConsulta)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada"));
+
+        if (!consulta.getPaciente().getUser().getUserID().equals(user.getUserID())) 
+        {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a visualizar essa consulta."); 
+        }
+    
+        ReturnConsultaCompletaDTO consultaRetorno = new ReturnConsultaCompletaDTO(consulta.getConsultaId(),
+         consulta.getPaciente(),
+         profissionalConsultaService.profissionalConsultaToDTO(consulta.getProfissionalConsulta()) ,
+         consulta.getEstabelecimentoSaude(),
+         consulta.getMotivoConsulta(),
+         consulta.getObservacaoConsulta(),
+         consulta.getConsultaData(),
+         atestadoService.buscarAtestado(idConsulta),
+         receitaService.buscarReceita(idConsulta),
+         pedidoExameService.buscarPedidoExame(idConsulta));
+
+         return consultaRetorno;
     }
 
 }

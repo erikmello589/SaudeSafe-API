@@ -41,6 +41,7 @@ public class Receita
     @NotNull
     private boolean temAnexo = false;
 
+    @JsonIgnore
     private byte[] pdfAnexado;
 
     @CreationTimestamp

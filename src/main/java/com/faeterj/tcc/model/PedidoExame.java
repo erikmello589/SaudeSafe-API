@@ -36,6 +36,7 @@ public class PedidoExame
     @NotNull
     private boolean temAnexo = false;
 
+    @JsonIgnore
     private byte[] pdfAnexado;
 
     @OneToMany(mappedBy = "pedidoExame", cascade = CascadeType.ALL)

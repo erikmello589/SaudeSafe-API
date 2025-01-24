@@ -33,6 +33,7 @@ public class Atestado
     @NotNull
     private boolean temAnexo = false;
 
+    @JsonIgnore
     private byte[] pdfAnexado;
 
     private String periodoAfastamento;

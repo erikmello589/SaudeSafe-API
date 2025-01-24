@@ -90,6 +90,23 @@ public class ConsultaController {
         }
     }
 
+    @GetMapping("/consulta/{consultaId}")
+    public ResponseEntity<?> buscaConsultaCompleta(@PathVariable("consultaId") Long consultaId,
+                                                    JwtAuthenticationToken token) 
+    {
+        try 
+        {
+            User user = userService.acharUserPorId(UUID.fromString(token.getName()));
+            var consultaEncontrada = consultaService.acharConsultaPorId(consultaId, user);
+            return ResponseEntity.status(HttpStatus.OK).body(consultaEncontrada);
+        } 
+        catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
+        }
+    }
+
+
+
     @GetMapping("/consultas/paciente/{pacienteId}")
     public ResponseEntity<?> listaConsultasPaciente(@PathVariable("pacienteId") Long idPaciente, 
                                                     @RequestParam(value = "page", defaultValue = "0") int page, 
