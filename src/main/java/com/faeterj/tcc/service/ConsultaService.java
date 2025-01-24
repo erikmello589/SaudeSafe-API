@@ -26,16 +26,19 @@ public class ConsultaService
     private final EstabelecimentoSaudeService estabelecimentoSaudeService;
     private final ReceitaService receitaService;
     private final AtestadoService atestadoService;
+    private final PedidoExameService pedidoExameService;
     private final ConsultaRepository consultaRepository;
 
     public ConsultaService(PacienteService pacienteService, ProfissionalConsultaService profissionalConsultaService,
             EstabelecimentoSaudeService estabelecimentoSaudeService, ReceitaService receitaService,
-            AtestadoService atestadoService, ConsultaRepository consultaRepository) {
+            AtestadoService atestadoService, PedidoExameService pedidoExameService,
+            ConsultaRepository consultaRepository) {
         this.pacienteService = pacienteService;
         this.profissionalConsultaService = profissionalConsultaService;
         this.estabelecimentoSaudeService = estabelecimentoSaudeService;
         this.receitaService = receitaService;
         this.atestadoService = atestadoService;
+        this.pedidoExameService = pedidoExameService;
         this.consultaRepository = consultaRepository;
     }
 
@@ -92,6 +95,7 @@ public class ConsultaService
             profissionalConsultaService.excluirProfissionalConsulta(profissionalSaudeId);
             receitaService.excluirReceita(idConsulta, user);
             atestadoService.excluirAtestado(idConsulta, user);
+            pedidoExameService.excluirPedidoExame(idConsulta, user);
             consultaRepository.deleteById(idConsulta);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a deletar este paciente");

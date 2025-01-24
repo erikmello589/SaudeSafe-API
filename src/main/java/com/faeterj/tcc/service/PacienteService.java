@@ -42,7 +42,9 @@ public class PacienteService {
         boolean isAdmin = user.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase(Role.Values.ADMIN.name()));
 
-        if (isAdmin || paciente.getUser().getUserID().equals(user.getUserID())) {
+        if (isAdmin || paciente.getUser().getUserID().equals(user.getUserID())) 
+        {
+            //TODO: deletar todas as consultas (e seus atestados, receitas, pedido de exames e laudos)
             pacienteRepository.deleteById(idPaciente);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a deletar este paciente");
