@@ -23,6 +23,7 @@ import com.faeterj.tcc.dto.CreateConsultaDTO;
 import com.faeterj.tcc.dto.CreatePedidoExameDTO;
 import com.faeterj.tcc.dto.CreateReceitaDTO;
 import com.faeterj.tcc.dto.RequestResponseDTO;
+import com.faeterj.tcc.dto.ReturnConsultaCompletaDTO;
 import com.faeterj.tcc.model.User;
 import com.faeterj.tcc.service.AtestadoService;
 import com.faeterj.tcc.service.ConsultaService;
@@ -97,15 +98,13 @@ public class ConsultaController {
         try 
         {
             User user = userService.acharUserPorId(UUID.fromString(token.getName()));
-            var consultaEncontrada = consultaService.acharConsultaPorId(consultaId, user);
+            ReturnConsultaCompletaDTO consultaEncontrada = consultaService.acharConsultaPorId(consultaId, user);
             return ResponseEntity.status(HttpStatus.OK).body(consultaEncontrada);
         } 
         catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
         }
     }
-
-
 
     @GetMapping("/consultas/paciente/{pacienteId}")
     public ResponseEntity<?> listaConsultasPaciente(@PathVariable("pacienteId") Long idPaciente, 
@@ -183,6 +182,32 @@ public class ConsultaController {
         }
     }
 
+    @GetMapping("/atestado/anexo/consulta/{idConsulta}")
+    public ResponseEntity<?> buscarAnexoAtestado(@PathVariable("idConsulta") Long idConsulta, JwtAuthenticationToken token) 
+    {
+        try 
+        {
+            User user = userService.acharUserPorId(UUID.fromString(token.getName()));
+            var atestado = atestadoService.buscarAtestado(idConsulta, user).get();
+            return ResponseEntity.status(HttpStatus.OK).header("Content-Type", atestado.getTipoAnexo()).body(atestado.getPdfAnexado());
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
+        }
+    }
+
+    @DeleteMapping("/atestado/anexo/consulta/{idConsulta}")
+    public ResponseEntity<RequestResponseDTO> excluirAnexoAtestado(@PathVariable("idConsulta") Long idConsulta, JwtAuthenticationToken token) 
+    {
+        try 
+        {
+            User user = userService.acharUserPorId(UUID.fromString(token.getName()));
+            atestadoService.excluirAnexoAtestado(idConsulta, user);
+            return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Anexo do Atestado excluido com sucesso.", 200));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
+        }
+    }
+
     @PostMapping("/receita/consulta/{idConsulta}")
     public ResponseEntity<RequestResponseDTO> criarReceita(
             @PathVariable("idConsulta") Long idConsulta, 
@@ -221,6 +246,19 @@ public class ConsultaController {
             User user = userService.acharUserPorId(UUID.fromString(token.getName()));
             receitaService.excluirReceita(idConsulta, user);
             return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Receita excluida com sucesso.", 200));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
+        }
+    }
+
+    @DeleteMapping("/anexo/receita/consulta/{idConsulta}")
+    public ResponseEntity<RequestResponseDTO> excluirAnexoReceita(@PathVariable("idConsulta") Long idConsulta, JwtAuthenticationToken token) 
+    {
+        try 
+        {
+            User user = userService.acharUserPorId(UUID.fromString(token.getName()));
+            receitaService.excluirAnexoReceita(idConsulta, user);
+            return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Anexo da receita removido com sucesso.", 200));
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
         }
@@ -264,6 +302,19 @@ public class ConsultaController {
             User user = userService.acharUserPorId(UUID.fromString(token.getName()));
             pedidoExameService.excluirPedidoExame(idConsulta, user);
             return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Pedido excluido com sucesso.", 200));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
+        }
+    }
+
+    @DeleteMapping("/anexo/pedidoExame/consulta/{idConsulta}")
+    public ResponseEntity<RequestResponseDTO> excluirAnexoPedidoExame(@PathVariable("idConsulta") Long idConsulta, JwtAuthenticationToken token) 
+    {
+        try 
+        {
+            User user = userService.acharUserPorId(UUID.fromString(token.getName()));
+            pedidoExameService.excluirAnexoPedidoExame(idConsulta, user);
+            return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Anexo do Pedido removido com sucesso.", 200));
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
         }

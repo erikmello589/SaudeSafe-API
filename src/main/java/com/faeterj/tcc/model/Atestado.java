@@ -36,6 +36,9 @@ public class Atestado
     @JsonIgnore
     private byte[] pdfAnexado;
 
+    @NotNull
+    private String tipoAnexo = "";
+
     private String periodoAfastamento;
 
     private String observacaoAtestado;
@@ -73,6 +76,14 @@ public class Atestado
 
     public void setPdfAnexado(byte[] pdfAnexado) {
         this.pdfAnexado = pdfAnexado;
+    }
+    
+    public String getTipoAnexo() {
+        return tipoAnexo;
+    }
+
+    public void setTipoAnexo(String tipoAnexo) {
+        this.tipoAnexo = tipoAnexo;
     }
 
     public String getPeriodoAfastamento() {

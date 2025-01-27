@@ -44,6 +44,9 @@ public class Receita
     @JsonIgnore
     private byte[] pdfAnexado;
 
+    @NotNull
+    private String tipoAnexo = "";
+
     @CreationTimestamp
     private Instant receitaDataCriacao;
 
@@ -101,5 +104,13 @@ public class Receita
 
     public void setReceitaDataCriacao(Instant receitaDataCriacao) {
         this.receitaDataCriacao = receitaDataCriacao;
+    }
+
+    public String getTipoAnexo() {
+        return tipoAnexo;
+    }
+
+    public void setTipoAnexo(String tipoAnexo) {
+        this.tipoAnexo = tipoAnexo;
     }
 }

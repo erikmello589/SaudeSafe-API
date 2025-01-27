@@ -59,6 +59,7 @@ public class PedidoExameService
             }
 
             // Converter arquivo para byte[] e salvar na receita
+            pedidoExame.setTipoAnexo(contentType);
             pedidoExame.setPdfAnexado(file.getBytes());
             pedidoExame.setTemAnexo(true);
         } 
@@ -104,6 +105,7 @@ public class PedidoExameService
             }
 
             // Converter arquivo para byte[] e salvar no Atestado
+            pedidoExame.setTipoAnexo(contentType);
             pedidoExame.setPdfAnexado(file.getBytes());
             pedidoExame.setTemAnexo(true);
         }
@@ -133,8 +135,36 @@ public class PedidoExameService
                 });
     }
 
-    public Optional<PedidoExame> buscarPedidoExame(Long idConsulta)
+    public void excluirAnexoPedidoExame(Long idConsulta, User user) 
     {
+        // Busca a consulta associada
+        Consulta consulta = consultaRepository.findById(idConsulta)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada"));
+    
+        if (!consulta.getPaciente().getUser().getUserID().equals(user.getUserID())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a modificar essa consulta.");
+        }
+    
+        pedidoExameRepository.findByConsultaConsultaId(idConsulta)
+                .ifPresent(pedidoExame -> {
+                    pedidoExame.setPdfAnexado(null);
+                    pedidoExame.setTemAnexo(false);
+                    pedidoExame.setTipoAnexo("");
+                    pedidoExameRepository.save(pedidoExame);
+                });
+    }
+
+    public Optional<PedidoExame> buscarPedidoExame(Long idConsulta, User user)
+    {
+        // Busca a consulta associada
+        Consulta consulta = consultaRepository.findById(idConsulta)
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada"));
+
+        if (!consulta.getPaciente().getUser().getUserID().equals(user.getUserID())) 
+        {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a modificar essa consulta."); 
+        }
+        
         return pedidoExameRepository.findByConsultaConsultaId(idConsulta);
     }
 

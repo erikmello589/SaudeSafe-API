@@ -60,6 +60,7 @@ public class ReceitaService
             }
 
             // Converter arquivo para byte[] e salvar na receita
+            receita.setTipoAnexo(contentType);
             receita.setPdfAnexado(file.getBytes());
             receita.setTemAnexo(true);
         } 
@@ -106,6 +107,7 @@ public class ReceitaService
             }
 
             // Converter arquivo para byte[] e salvar no Atestado
+            receita.setTipoAnexo(contentType);
             receita.setPdfAnexado(file.getBytes());
             receita.setTemAnexo(true);
         }
@@ -135,11 +137,38 @@ public class ReceitaService
                 });
     }
 
-    public Optional<Receita> buscarReceita(Long idConsulta)
+    public void excluirAnexoReceita(Long idConsulta, User user) 
     {
+        // Busca a consulta associada
+        Consulta consulta = consultaRepository.findById(idConsulta)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada"));
+    
+        if (!consulta.getPaciente().getUser().getUserID().equals(user.getUserID())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a modificar essa consulta.");
+        }
+    
+        receitaRepository.findByConsultaConsultaId(idConsulta)
+                .ifPresent(receita -> {
+                    receita.setPdfAnexado(null);
+                    receita.setTemAnexo(false);
+                    receita.setTipoAnexo("");
+                    receitaRepository.save(receita);
+                });
+    }
+
+    public Optional<Receita> buscarReceita(Long idConsulta, User user)
+    {
+        // Busca a consulta associada
+        Consulta consulta = consultaRepository.findById(idConsulta)
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada"));
+
+        if (!consulta.getPaciente().getUser().getUserID().equals(user.getUserID())) 
+        {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a modificar essa consulta."); 
+        }
+        
         return receitaRepository.findByConsultaConsultaId(idConsulta);
     }
-    
 
     private boolean isValidFileType(String contentType) {
         return contentType.equals("application/pdf") ||

@@ -194,9 +194,9 @@ public class ConsultaService
          consulta.getMotivoConsulta(),
          consulta.getObservacaoConsulta(),
          consulta.getConsultaData(),
-         atestadoService.buscarAtestado(idConsulta),
-         receitaService.buscarReceita(idConsulta),
-         pedidoExameService.buscarPedidoExame(idConsulta));
+         atestadoService.buscarAtestado(idConsulta, user),
+         receitaService.buscarReceita(idConsulta, user),
+         pedidoExameService.buscarPedidoExame(idConsulta, user));
 
          return consultaRetorno;
     }

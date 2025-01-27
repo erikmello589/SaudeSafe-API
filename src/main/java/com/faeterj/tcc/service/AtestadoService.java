@@ -58,6 +58,7 @@ public class AtestadoService {
             }
 
             // Converter arquivo para byte[] e salvar no Atestado
+            atestado.setTipoAnexo(contentType);
             atestado.setPdfAnexado(file.getBytes());
             atestado.setTemAnexo(true);
         } 
@@ -102,6 +103,7 @@ public class AtestadoService {
             }
 
             // Converter arquivo para byte[] e salvar no Atestado
+            atestado.setTipoAnexo(contentType);
             atestado.setPdfAnexado(file.getBytes());
             atestado.setTemAnexo(true);
         }
@@ -126,8 +128,37 @@ public class AtestadoService {
                 });
     }
 
-    public Optional<Atestado> buscarAtestado(Long idConsulta)
+    public void excluirAnexoAtestado(Long idConsulta, User user)
     {
+        // Busca a consulta associada
+        Consulta consulta = consultaRepository.findById(idConsulta)
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada"));
+
+        if (!consulta.getPaciente().getUser().getUserID().equals(user.getUserID())) 
+        {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a modificar essa consulta."); 
+        }
+
+        atestadoRepository.findByConsultaConsultaId(idConsulta)
+                .ifPresent(atestado -> {
+                    atestado.setPdfAnexado(null);
+                    atestado.setTemAnexo(false);
+                    atestado.setTipoAnexo("");
+                    atestadoRepository.save(atestado);
+                });
+    }
+
+    public Optional<Atestado> buscarAtestado(Long idConsulta, User user)
+    {
+        // Busca a consulta associada
+        Consulta consulta = consultaRepository.findById(idConsulta)
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada"));
+
+        if (!consulta.getPaciente().getUser().getUserID().equals(user.getUserID())) 
+        {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a modificar essa consulta."); 
+        }
+        
         return atestadoRepository.findByConsultaConsultaId(idConsulta);
     }
 

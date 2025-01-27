@@ -39,6 +39,9 @@ public class PedidoExame
     @JsonIgnore
     private byte[] pdfAnexado;
 
+    @NotNull
+    private String tipoAnexo = "";
+
     @OneToMany(mappedBy = "pedidoExame", cascade = CascadeType.ALL)
     private List<Exame> exames;
 
@@ -77,6 +80,14 @@ public class PedidoExame
 
     public void setPdfAnexado(byte[] pdfAnexado) {
         this.pdfAnexado = pdfAnexado;
+    }
+
+    public String getTipoAnexo() {
+        return tipoAnexo;
+    }
+
+    public void setTipoAnexo(String tipoAnexo) {
+        this.tipoAnexo = tipoAnexo;
     }
 
     public List<Exame> getExames() {
