@@ -91,6 +91,6 @@ public class PacienteService {
 
     public Paciente acharPacientePorId(Long idPaciente) {
         return pacienteRepository.findById(idPaciente)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente não encontrado"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente não encontrado."));
     }
 }

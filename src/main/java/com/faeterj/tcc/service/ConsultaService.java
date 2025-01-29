@@ -100,7 +100,7 @@ public class ConsultaService
             pedidoExameService.excluirPedidoExame(idConsulta, user);
             consultaRepository.deleteById(idConsulta);
         } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a deletar este paciente");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a deletar essa consulta.");
         }
     }
 
