@@ -1,7 +1,6 @@
 package com.faeterj.tcc.service;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -85,8 +84,11 @@ public class PedidoExameService
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a modificar essa consulta."); 
         }
 
-        PedidoExame pedidoExame = pedidoExameRepository.findByConsultaConsultaId(idConsulta)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Não há Pedido de Exames anexado a essa consulta."));
+        PedidoExame pedidoExame = consulta.getPedidoExame();
+        if (pedidoExame == null)
+        {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Não há Pedido de Exames anexado a essa consulta."); 
+        }
 
         pedidoExame.setPedidoObservacao(createPedidoExameDTO.pedidoObservacao());
         
@@ -127,12 +129,12 @@ public class PedidoExameService
         if (!consulta.getPaciente().getUser().getUserID().equals(user.getUserID())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a modificar essa consulta.");
         }
-    
-        pedidoExameRepository.findByConsultaConsultaId(idConsulta)
-                .ifPresent(pedidoExame -> {
-                    exameService.ApagarExamesDoPedido(pedidoExame.getPedidoExameId());
-                    pedidoExameRepository.deleteById(pedidoExame.getPedidoExameId());
-                });
+
+        PedidoExame pedidoExame = consulta.getPedidoExame();
+        if (pedidoExame != null)
+        {
+            pedidoExameRepository.deleteById(pedidoExame.getPedidoExameId());
+        }
     }
 
     public void excluirAnexoPedidoExame(Long idConsulta, User user) 
@@ -145,16 +147,17 @@ public class PedidoExameService
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a modificar essa consulta.");
         }
     
-        pedidoExameRepository.findByConsultaConsultaId(idConsulta)
-                .ifPresent(pedidoExame -> {
-                    pedidoExame.setPdfAnexado(null);
-                    pedidoExame.setTemAnexo(false);
-                    pedidoExame.setTipoAnexo("");
-                    pedidoExameRepository.save(pedidoExame);
-                });
+        PedidoExame pedidoExame = consulta.getPedidoExame();
+        if (pedidoExame != null)
+        {
+            pedidoExame.setPdfAnexado(null);
+            pedidoExame.setTemAnexo(false);
+            pedidoExame.setTipoAnexo("");
+            pedidoExameRepository.save(pedidoExame);
+        }
     }
 
-    public Optional<PedidoExame> buscarPedidoExame(Long idConsulta, User user)
+    public PedidoExame buscarPedidoExame(Long idConsulta, User user)
     {
         // Busca a consulta associada
         Consulta consulta = consultaRepository.findById(idConsulta)
@@ -164,8 +167,14 @@ public class PedidoExameService
         {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a modificar essa consulta."); 
         }
+
+        PedidoExame pedidoExame = consulta.getPedidoExame();
+        if (!pedidoExame.getTemAnexo())
+        {
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT, "O Atestado desejado não contem um arquivo anexado"); 
+        }
         
-        return pedidoExameRepository.findByConsultaConsultaId(idConsulta);
+        return consulta.getPedidoExame();
     }
 
     private boolean isValidFileType(String contentType) {

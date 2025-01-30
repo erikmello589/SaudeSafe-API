@@ -26,21 +26,13 @@ public class ConsultaService
     private final PacienteService pacienteService;
     private final ProfissionalConsultaService profissionalConsultaService;
     private final EstabelecimentoSaudeService estabelecimentoSaudeService;
-    private final ReceitaService receitaService;
-    private final AtestadoService atestadoService;
-    private final PedidoExameService pedidoExameService;
     private final ConsultaRepository consultaRepository;
 
     public ConsultaService(PacienteService pacienteService, ProfissionalConsultaService profissionalConsultaService,
-            EstabelecimentoSaudeService estabelecimentoSaudeService, ReceitaService receitaService,
-            AtestadoService atestadoService, PedidoExameService pedidoExameService,
-            ConsultaRepository consultaRepository) {
+            EstabelecimentoSaudeService estabelecimentoSaudeService, ConsultaRepository consultaRepository) {
         this.pacienteService = pacienteService;
         this.profissionalConsultaService = profissionalConsultaService;
         this.estabelecimentoSaudeService = estabelecimentoSaudeService;
-        this.receitaService = receitaService;
-        this.atestadoService = atestadoService;
-        this.pedidoExameService = pedidoExameService;
         this.consultaRepository = consultaRepository;
     }
 
@@ -86,18 +78,6 @@ public class ConsultaService
 
         if (isAdmin || consulta.getPaciente().getUser().getUserID().equals(user.getUserID())) 
         {
-            Long estabelecimentoId, profissionalSaudeId;
-
-            estabelecimentoId = consulta.getEstabelecimentoSaude().getEstabelecimentoId();
-            profissionalSaudeId = consulta.getProfissionalConsulta().getProfissionalSaudeId();
-            consulta.setEstabelecimentoSaude(null);
-            consulta.setProfissionalConsulta(null);
-
-            estabelecimentoSaudeService.excluirEstabelecimento(estabelecimentoId);
-            profissionalConsultaService.excluirProfissionalConsulta(profissionalSaudeId);
-            receitaService.excluirReceita(idConsulta, user);
-            atestadoService.excluirAtestado(idConsulta, user);
-            pedidoExameService.excluirPedidoExame(idConsulta, user);
             consultaRepository.deleteById(idConsulta);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a deletar essa consulta.");
@@ -194,9 +174,9 @@ public class ConsultaService
          consulta.getMotivoConsulta(),
          consulta.getObservacaoConsulta(),
          consulta.getConsultaData(),
-         atestadoService.buscarAtestado(idConsulta, user),
-         receitaService.buscarReceita(idConsulta, user),
-         pedidoExameService.buscarPedidoExame(idConsulta, user));
+         consulta.getAtestado(),
+         consulta.getReceita(),
+         consulta.getPedidoExame());
 
          return consultaRetorno;
     }

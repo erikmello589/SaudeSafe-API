@@ -1,7 +1,6 @@
 package com.faeterj.tcc.service;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -86,9 +85,11 @@ public class ReceitaService
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a modificar essa consulta."); 
         }
 
-        // Criação do objeto Atestado a partir do DTO
-        Receita receita = receitaRepository.findByConsultaConsultaId(idConsulta)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Não há receita anexada a essa consulta."));
+        Receita receita = consulta.getReceita();
+        if (receita == null)
+        {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Não há receita associada a essa consulta.");
+        }
 
         receita.setObservacaoReceita(createReceitaDTO.observacaoReceita());
         
@@ -129,12 +130,12 @@ public class ReceitaService
         if (!consulta.getPaciente().getUser().getUserID().equals(user.getUserID())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a modificar essa consulta.");
         }
-    
-        receitaRepository.findByConsultaConsultaId(idConsulta)
-                .ifPresent(receita -> {
-                    receitaMedicamentoService.ApagarMedicamentosDaReceita(receita.getReceitaId());
-                    receitaRepository.deleteById(receita.getReceitaId());
-                });
+
+        Receita receita = consulta.getReceita();
+        if (receita != null)
+        {
+            receitaRepository.deleteById(receita.getReceitaId());
+        } 
     }
 
     public void excluirAnexoReceita(Long idConsulta, User user) 
@@ -146,17 +147,18 @@ public class ReceitaService
         if (!consulta.getPaciente().getUser().getUserID().equals(user.getUserID())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a modificar essa consulta.");
         }
-    
-        receitaRepository.findByConsultaConsultaId(idConsulta)
-                .ifPresent(receita -> {
-                    receita.setPdfAnexado(null);
-                    receita.setTemAnexo(false);
-                    receita.setTipoAnexo("");
-                    receitaRepository.save(receita);
-                });
+
+        Receita receita = consulta.getReceita();
+        if (receita != null)
+        {
+            receita.setPdfAnexado(null);
+            receita.setTemAnexo(false);
+            receita.setTipoAnexo("");
+            receitaRepository.save(receita);
+        }
     }
 
-    public Optional<Receita> buscarReceita(Long idConsulta, User user)
+    public Receita buscarReceita(Long idConsulta, User user)
     {
         // Busca a consulta associada
         Consulta consulta = consultaRepository.findById(idConsulta)
@@ -166,8 +168,14 @@ public class ReceitaService
         {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a modificar essa consulta."); 
         }
+
+        Receita receita = consulta.getReceita();
+        if (!receita.getTemAnexo())
+        {
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT, "O Atestado desejado não contem um arquivo anexado"); 
+        }
         
-        return receitaRepository.findByConsultaConsultaId(idConsulta);
+        return consulta.getReceita();
     }
 
     private boolean isValidFileType(String contentType) {

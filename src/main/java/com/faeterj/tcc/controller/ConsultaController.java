@@ -25,6 +25,9 @@ import com.faeterj.tcc.dto.CreateReceitaDTO;
 import com.faeterj.tcc.dto.ListaConsultasDTO;
 import com.faeterj.tcc.dto.RequestResponseDTO;
 import com.faeterj.tcc.dto.ReturnConsultaCompletaDTO;
+import com.faeterj.tcc.model.Atestado;
+import com.faeterj.tcc.model.PedidoExame;
+import com.faeterj.tcc.model.Receita;
 import com.faeterj.tcc.model.User;
 import com.faeterj.tcc.service.AtestadoService;
 import com.faeterj.tcc.service.ConsultaService;
@@ -613,7 +616,7 @@ public class ConsultaController {
         try 
         {
             User user = userService.acharUserPorId(UUID.fromString(token.getName()));
-            var atestado = atestadoService.buscarAtestado(idConsulta, user).get();
+            Atestado atestado = atestadoService.buscarAtestado(idConsulta, user);
             return ResponseEntity.status(HttpStatus.OK).header("Content-Type", atestado.getTipoAnexo()).body(atestado.getPdfAnexado());
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
@@ -813,7 +816,7 @@ public class ConsultaController {
         try 
         {
             User user = userService.acharUserPorId(UUID.fromString(token.getName()));
-            var receita = receitaService.buscarReceita(idConsulta, user).get();
+            Receita receita = receitaService.buscarReceita(idConsulta, user);
             return ResponseEntity.status(HttpStatus.OK).header("Content-Type", receita.getTipoAnexo()).body(receita.getPdfAnexado());
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
@@ -1013,8 +1016,8 @@ public class ConsultaController {
         try 
         {
             User user = userService.acharUserPorId(UUID.fromString(token.getName()));
-            var pedidoReceita = pedidoExameService.buscarPedidoExame(idConsulta, user).get();
-            return ResponseEntity.status(HttpStatus.OK).header("Content-Type", pedidoReceita.getTipoAnexo()).body(pedidoReceita.getPdfAnexado());
+            PedidoExame pedidoExame = pedidoExameService.buscarPedidoExame(idConsulta, user);
+            return ResponseEntity.status(HttpStatus.OK).header("Content-Type", pedidoExame.getTipoAnexo()).body(pedidoExame.getPdfAnexado());
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
         }

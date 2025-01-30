@@ -42,7 +42,7 @@ public class PedidoExame
     @NotNull
     private String tipoAnexo = "";
 
-    @OneToMany(mappedBy = "pedidoExame", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "pedidoExame", cascade = CascadeType.ALL)
     private List<Exame> exames;
 
     @CreationTimestamp

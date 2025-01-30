@@ -44,7 +44,6 @@ public class PacienteService {
 
         if (isAdmin || paciente.getUser().getUserID().equals(user.getUserID())) 
         {
-            //TODO: deletar todas as consultas (e seus atestados, receitas, pedido de exames e laudos)
             pacienteRepository.deleteById(idPaciente);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a deletar este paciente");

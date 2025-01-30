@@ -1,7 +1,6 @@
 package com.faeterj.tcc.service;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -81,9 +80,11 @@ public class AtestadoService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a modificar essa consulta."); 
         }
 
-        // Criação do objeto Atestado a partir do DTO
-        Atestado atestado = atestadoRepository.findByConsultaConsultaId(idConsulta)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Não há atestado anexado a essa consulta."));
+        Atestado atestado = consulta.getAtestado();
+        if (atestado == null)
+        {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Não há atestado anexado a essa consulta.");
+        }                  
 
         atestado.setPeriodoAfastamento(createAtestadoDTO.periodoAfastamento());
         atestado.setObservacaoAtestado(createAtestadoDTO.observacaoAtestado());
@@ -122,10 +123,10 @@ public class AtestadoService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a modificar essa consulta."); 
         }
 
-        atestadoRepository.findByConsultaConsultaId(idConsulta)
-                .ifPresent(atestado -> {
-                    atestadoRepository.deleteById(atestado.getAtestadoId());
-                });
+        if(consulta.getAtestado() != null)
+        {
+            atestadoRepository.deleteById(consulta.getAtestado().getAtestadoId());
+        }
     }
 
     public void excluirAnexoAtestado(Long idConsulta, User user)
@@ -139,16 +140,17 @@ public class AtestadoService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a modificar essa consulta."); 
         }
 
-        atestadoRepository.findByConsultaConsultaId(idConsulta)
-                .ifPresent(atestado -> {
-                    atestado.setPdfAnexado(null);
-                    atestado.setTemAnexo(false);
-                    atestado.setTipoAnexo("");
-                    atestadoRepository.save(atestado);
-                });
+        Atestado atestado = consulta.getAtestado();
+        if(atestado != null)
+        {
+            atestado.setPdfAnexado(null);
+            atestado.setTemAnexo(false);
+            atestado.setTipoAnexo("");
+            atestadoRepository.save(atestado);
+        }
     }
 
-    public Optional<Atestado> buscarAtestado(Long idConsulta, User user)
+    public Atestado buscarAtestado(Long idConsulta, User user)
     {
         // Busca a consulta associada
         Consulta consulta = consultaRepository.findById(idConsulta)
@@ -159,7 +161,13 @@ public class AtestadoService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a modificar essa consulta."); 
         }
         
-        return atestadoRepository.findByConsultaConsultaId(idConsulta);
+        Atestado atestado = consulta.getAtestado();
+        if (!atestado.getTemAnexo())
+        {
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT, "O Atestado desejado não contem um arquivo anexado"); 
+        }
+        
+        return atestado;
     }
 
     private boolean isValidFileType(String contentType) {
