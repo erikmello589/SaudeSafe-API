@@ -4,6 +4,9 @@ import java.time.Instant;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -27,11 +30,11 @@ public class Consulta
     @JoinColumn(name = "paciente_id")
     private Paciente paciente;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "profissional_id")
     private ProfissionalConsulta profissionalConsulta;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "estabelecimento_id")
     private EstabelecimentoSaude estabelecimentoSaude;
 
@@ -43,6 +46,42 @@ public class Consulta
 
     @CreationTimestamp
     private Instant consultaDataCriacao;
+
+    @OneToOne(mappedBy = "consulta", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Atestado atestado;
+
+    @OneToOne(mappedBy = "consulta", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Receita receita;
+
+    @OneToOne(mappedBy = "consulta", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private PedidoExame pedidoExame;
+
+    public Atestado getAtestado() {
+        return atestado;
+    }
+
+    public void setAtestado(Atestado atestado) {
+        this.atestado = atestado;
+    }
+
+    public Receita getReceita() {
+        return receita;
+    }
+
+    public void setReceita(Receita receita) {
+        this.receita = receita;
+    }
+
+    public PedidoExame getPedidoExame() {
+        return pedidoExame;
+    }
+
+    public void setPedidoExame(PedidoExame pedidoExame) {
+        this.pedidoExame = pedidoExame;
+    }
 
     public Long getConsultaId() {
         return consultaId;

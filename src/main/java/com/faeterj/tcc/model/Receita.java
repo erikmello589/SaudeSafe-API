@@ -33,7 +33,7 @@ public class Receita
     @JsonIgnore
     private Consulta consulta;
 
-    @OneToMany(mappedBy = "receita", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "receita", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReceitaMedicamento> medicamentos;
    
     private String observacaoReceita;
