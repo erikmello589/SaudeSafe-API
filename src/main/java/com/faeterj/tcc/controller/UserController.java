@@ -8,6 +8,15 @@ import com.faeterj.tcc.model.User;
 import com.faeterj.tcc.service.PasswordResetService;
 import com.faeterj.tcc.service.RedefinicaoSenhaService;
 import com.faeterj.tcc.service.UserService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
+@Tag(name = "Usuário", description = "Endpoints para gerenciamento de Usuários e suas informações.")
 public class UserController {
 
     private final UserService userService;
@@ -32,6 +42,27 @@ public class UserController {
         this.redefinicaoSenhaService = redefinicaoSenhaService;
     }
 
+    @Operation(
+        summary = "Crie uma conta de usuário.",
+        description = "Dadas as credenciais requisitadas, faça um cadastro de um Usuário simples no sistema.\n Endpoint Público a todos os visitantes.",
+        responses = {
+            @ApiResponse(responseCode = "201", description = "Conta de usuário criada com sucesso.", content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = RequestResponseDTO.class),
+                examples = @ExampleObject(value = "{\"message\": \"Usuário criado com sucesso.\", \"status\": 201}")
+            )),
+            @ApiResponse(responseCode = "409", description = "As credenciais informadas estão em conflito com dados já existentes no sistema.", content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = RequestResponseDTO.class),
+                examples = @ExampleObject(value = "{\"message\": \"Email já existente.\", \"status\": 409}")
+            )),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = RequestResponseDTO.class),
+                examples = @ExampleObject(value = "{\"message\": \"Erro interno no servidor.\", \"status\": 500}")
+            ))
+        }
+    )
     @PostMapping("/cadastrar")
     public ResponseEntity<RequestResponseDTO> newUser(@RequestBody CreateUserDTO createUserDTO) {
         try {
@@ -66,6 +97,7 @@ public class UserController {
 
     @GetMapping("/users")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    @SecurityRequirement(name = "Auth JWT")
     public ResponseEntity<List<User>> listaUsuarios() {
         List<User> users = userService.listAllUsers();
         return ResponseEntity.ok(users);

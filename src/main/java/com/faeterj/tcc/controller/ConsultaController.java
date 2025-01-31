@@ -592,6 +592,7 @@ public class ConsultaController {
         description = "Dado o ID de uma consulta, visualize o arquivo anexado do atestado médico associado a ela.\n Endpoint Restrito somente a Usuários Logados.",
         responses = {
             @ApiResponse(responseCode = "200", description = "Anexo do atestado será exibido com sucesso (PDF, JPG ou PNG)."),
+            @ApiResponse(responseCode = "204", description = "O Atestado médico não possui arquivo anexado."),
             @ApiResponse(responseCode = "401", description = "O usuário não está autenticado."),
             @ApiResponse(responseCode = "403", description = "O usuário não tem permissão para modificar essa consulta.", content = @Content(
                 mediaType = "application/json",
@@ -792,6 +793,7 @@ public class ConsultaController {
         description = "Dado o ID de uma consulta, visualize o arquivo anexado da Receita Médica associada a ela.\n Endpoint Restrito somente a Usuários Logados.",
         responses = {
             @ApiResponse(responseCode = "200", description = "Anexo da Receita será exibida com sucesso (PDF, JPG ou PNG)."),
+            @ApiResponse(responseCode = "204", description = "A Receita Médica desejada não possui arquivo anexado."),
             @ApiResponse(responseCode = "401", description = "O usuário não está autenticado."),
             @ApiResponse(responseCode = "403", description = "O usuário não tem permissão para modificar essa consulta.", content = @Content(
                 mediaType = "application/json",
@@ -992,6 +994,7 @@ public class ConsultaController {
         description = "Dado o ID de uma consulta, visualize o arquivo anexado do Pedido de exame associado a ela.\n Endpoint Restrito somente a Usuários Logados.",
         responses = {
             @ApiResponse(responseCode = "200", description = "Anexo do Pedido de Exame será exibido com sucesso (PDF, JPG ou PNG)."),
+            @ApiResponse(responseCode = "204", description = "O Pedido de Exames desejado não possui arquivo anexado."),
             @ApiResponse(responseCode = "401", description = "O usuário não está autenticado."),
             @ApiResponse(responseCode = "403", description = "O usuário não tem permissão para modificar essa consulta.", content = @Content(
                 mediaType = "application/json",

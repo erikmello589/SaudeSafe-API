@@ -41,6 +41,11 @@ public class ProfissionalSaudeService
         boolean isAdmin = user.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase(Role.Values.ADMIN.name()));
 
+        if (profissionalSaudeRepository.findByNumeroClasseConselhoAndEstadoProfissional(dto.numeroClasseConselho(), dto.estadoProfissional()).isPresent()) 
+        {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Profissional já existente.");
+        }
+
         ProfissionalSaude profissionalSaude = new ProfissionalSaude();
         profissionalSaude.setNomeProfissional(dto.nomeProfissional());
         profissionalSaude.setEspecialidadeProfissional(dto.especialidadeProfissional());
@@ -156,7 +161,7 @@ public class ProfissionalSaudeService
 
     public ProfissionalSaude acharProfissionalPorId(Long idProfissional) {
         return profissionalSaudeRepository.findById(idProfissional)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profissional não encontrado"));
     }
 
     public Optional<ProfissionalSaude> acharProfissionalPorConselhoEstado(String numeroClasseConselho, String estadoProfissional) {
@@ -166,6 +171,11 @@ public class ProfissionalSaudeService
     public StatusProfissional acharStatusProfissionalPorStatusId(Long statusId) {
         return statusProfissionalRepository.findById(statusId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "StatusProfissional não encontrado"));
+    }
+
+    public ReturnProfissionalDTO buscarProfissional(Long idProfissional)
+    {
+        return profissionalSaudeToDTO(acharProfissionalPorId(idProfissional));
     }
 
     public ReturnProfissionalDTO profissionalSaudeToDTO(ProfissionalSaude profissional)
