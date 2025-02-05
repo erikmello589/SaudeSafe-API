@@ -4,10 +4,11 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.faeterj.tcc.model.PasswordResetToken;
 import com.faeterj.tcc.model.User;
@@ -30,7 +31,7 @@ public class PasswordResetService {
 
         // Localizar o usuário pelo e-mail
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
 
         PasswordResetToken resetToken = tokenRepository.findByUserUserID(user.getUserID());
         

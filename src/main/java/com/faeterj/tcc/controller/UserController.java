@@ -73,16 +73,58 @@ public class UserController {
         }
     }
 
+    @Operation(
+        summary = "Informe e altere sua senha de usuário.",
+        description = "Endpoint para fazer a alteração de senha. Endpoint Público a todos os visitantes.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Senha Redefinida com sucesso.", content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = RequestResponseDTO.class),
+                examples = @ExampleObject(value = "{\"message\": \"Senha Redefinida com sucesso.\", \"status\": 200}")
+            )),
+            @ApiResponse(responseCode = "400", description = "Token Inválido ou Expirado.", content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = RequestResponseDTO.class),
+                examples = @ExampleObject(value = "{\"message\": \"Token Inválido ou Expirado.\", \"status\": 400}")
+            )),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = RequestResponseDTO.class),
+                examples = @ExampleObject(value = "{\"message\": \"Erro interno no servidor.\", \"status\": 500}")
+            ))
+        }
+    )
     @PostMapping("/redefinicao-senha")
     public ResponseEntity<RequestResponseDTO> resetPassword(@RequestBody RedefinicaoSenhaDTO redefinicaoSenhaDTO) {
         try {
             redefinicaoSenhaService.redefinirSenha(redefinicaoSenhaDTO);
-            return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Senha redefinida com sucesso!", 201));
+            return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Senha redefinida com sucesso!", 200));
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
         }
     }
 
+    @Operation(
+        summary = "Requisite o Email de Recuperação de Senha.",
+        description = "Endpoint para fazer a requisição do email de recuperação de senha. Endpoint Público a todos os visitantes.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Email de Recuperação Enviado com sucesso.", content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = RequestResponseDTO.class),
+                examples = @ExampleObject(value = "{\"message\": \"E-mail de redefinição enviado com sucesso! Verifique sua caixa de entrada e spam.\", \"status\": 200}")
+            )),
+            @ApiResponse(responseCode = "404", description = "Não há conta vinculada ao Email informado.", content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = RequestResponseDTO.class),
+                examples = @ExampleObject(value = "{\"message\": \"Usuário não encontrado.\", \"status\": 404}")
+            )),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = RequestResponseDTO.class),
+                examples = @ExampleObject(value = "{\"message\": \"Erro interno no servidor.\", \"status\": 500}")
+            ))
+        }
+    )
     @PostMapping("/esqueci-minha-senha")
     public ResponseEntity<RequestResponseDTO> forgotPassword(@RequestBody EsqueciMinhaSenhaDTO esqueciMinhaSenhaDTO) 
     {
@@ -95,6 +137,10 @@ public class UserController {
         }
     }
 
+    @Operation(
+        summary = "Visualize todas as contas de usuário.",
+        description = "Endpoint de cunho administrativo para fiscalização de todas as contas de usuário no sistema. Endpoint Restrito apenas a usuários administradores logados."
+    )
     @GetMapping("/users")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     @SecurityRequirement(name = "Auth JWT")

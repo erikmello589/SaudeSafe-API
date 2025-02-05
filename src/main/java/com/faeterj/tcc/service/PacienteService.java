@@ -66,7 +66,7 @@ public class PacienteService {
         } 
         else 
         {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a deletar este paciente");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a editar este paciente");
         }
     }
 
