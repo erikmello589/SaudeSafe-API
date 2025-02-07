@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -22,6 +23,7 @@ import com.faeterj.tcc.dto.EditaProfissionalDTO;
 import com.faeterj.tcc.dto.ListaProfissionaisDTO;
 import com.faeterj.tcc.dto.RequestResponseDTO;
 import com.faeterj.tcc.dto.ReturnProfissionalDTO;
+import com.faeterj.tcc.dto.statusRequisitadoDTO;
 import com.faeterj.tcc.model.User;
 import com.faeterj.tcc.service.ProfissionalSaudeService;
 import com.faeterj.tcc.service.UserService;
@@ -341,6 +343,55 @@ public class ProfissionalSaudeController {
         {
             var profissional = profissionalSaudeService.buscarProfissional(idProfissional);
             return ResponseEntity.status(HttpStatus.OK).body(profissional);
+        } 
+        catch (ResponseStatusException e) 
+        {
+            return ResponseEntity.status(e.getStatusCode()).body(new RequestResponseDTO(e.getReason(), e.getStatusCode().value()));
+        }
+    }
+
+    @Operation(
+        summary = "Faça a alteração apenas do atributo 'statusProfissional' de um médico.",
+        description = "Dado o ID de um profissional, Troque seu status no sistema.\n Endpoint Restrito somente a Usuários Administradores Logados.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Status do Profissional alterado com sucesso.", content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = RequestResponseDTO.class),
+                examples = @ExampleObject(value = "{\"message\": \"Status do Profissional alterado com sucesso.\", \"status\": 200}")
+            )),
+            @ApiResponse(responseCode = "400", description = "O Status de Profissional enviado é inválido.", content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = RequestResponseDTO.class),
+                examples = @ExampleObject(value = "{\"message\": \"O Status de Profissional enviado é inválido.\", \"status\": 400}")
+            )),
+            @ApiResponse(responseCode = "401", description = "O usuário não está autenticado."),
+            @ApiResponse(responseCode = "403", description = "Usuário não autorizado a editar este Profissional.", content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = RequestResponseDTO.class),
+                examples = @ExampleObject(value = "{\"message\": \"Usuário não autorizado a editar este Profissional.\", \"status\": 403}")
+            )),
+            @ApiResponse(responseCode = "404", description = "O Profissional desejado na requisição não foi encontrado no sistema.", content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = RequestResponseDTO.class),
+                examples = @ExampleObject(value = "{\"message\": \"Profissional não encontrado.\", \"status\": 404}")
+            )),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = RequestResponseDTO.class),
+                examples = @ExampleObject(value = "{\"message\": \"Erro interno no servidor.\", \"status\": 500}")
+            ))
+        }
+    )
+    @PatchMapping("/statusProfissional/{idProfissional}")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    @SecurityRequirement(name = "Auth JWT")
+    public ResponseEntity<RequestResponseDTO> verificaProfissional(@PathVariable("idProfissional") Long idProfissional, @RequestBody statusRequisitadoDTO statusDTO, JwtAuthenticationToken token) 
+    {
+        try 
+        {
+            User user = userService.acharUserPorId(UUID.fromString(token.getName()));
+            profissionalSaudeService.verificaProfissional(idProfissional, statusDTO.statusProfissional(), user);
+            return ResponseEntity.status(HttpStatus.OK).body(new RequestResponseDTO("Status do Profissional alterado com sucesso.", 200));
         } 
         catch (ResponseStatusException e) 
         {

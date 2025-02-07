@@ -199,6 +199,46 @@ public class ProfissionalSaudeService
         // Converte para DTO e retorna
         return profissionalSaudeToDTO(profissional);
     }
+
+    public void verificaProfissional(Long idProfissional, String statusRequisitado, User user) 
+    {
+        ProfissionalSaude profissionalSaude = profissionalSaudeRepository.findById(idProfissional)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profissional não encontrado."));
+        
+        boolean isAdmin = user.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase(Role.Values.ADMIN.name()));
+
+        if (isAdmin)
+        {
+            StatusEnum status;
+            try 
+            {
+                status = StatusEnum.valueOf(statusRequisitado.toUpperCase());
+            } 
+            catch (IllegalArgumentException e) 
+            {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O Status de Profissional enviado é inválido.");
+            }
+            StatusProfissional statusProfissional = statusProfissionalRepository.findByProfissionalId(profissionalSaude.getProfissionalSaudeId());
+            statusProfissional.setStatus(status); 
+            statusProfissional = statusProfissionalRepository.save(statusProfissional);
+
+            profissionalSaude.setStatusId(statusProfissional.getStatusId());
+            
+            profissionalSaude = profissionalSaudeRepository.save(profissionalSaude);
+
+            //altera todos os ProfissionalConsulta que tiverem o mesmo CRM que o que eu estou editando
+            profissionalConsultaRepository.atualizaCrmProfissionaisConsulta(profissionalSaude.getNomeProfissional(), profissionalSaude.getEspecialidadeProfissional(), profissionalSaude.getNumeroClasseConselho(), profissionalSaude.getEstadoProfissional(), profissionalSaude.getStatusId());
+
+            //retorno
+            return;
+        }
+        else
+        {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não autorizado a editar este Profissional.");
+        }
+
+    }
     
 
 }
