@@ -483,6 +483,11 @@ public class ConsultaController {
                 schema = @Schema(implementation = RequestResponseDTO.class),
                 examples = @ExampleObject(value = "{\"message\": \"Consulta não encontrada.\", \"status\": 404}")
             )),
+            @ApiResponse(responseCode = "415", description = "Tipo de Arquivo não suportado.", content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = RequestResponseDTO.class),
+                examples = @ExampleObject(value = "{\"message\": \"Tipo de Arquivo não suportado.\", \"status\": 415}")
+            )),
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content(
                 mediaType = "application/json",
                 schema = @Schema(implementation = RequestResponseDTO.class),
@@ -524,6 +529,11 @@ public class ConsultaController {
                 mediaType = "application/json",
                 schema = @Schema(implementation = RequestResponseDTO.class),
                 examples = @ExampleObject(value = "{\"message\": \"Consulta não encontrada.\", \"status\": 404}")
+            )),
+            @ApiResponse(responseCode = "415", description = "Tipo de Arquivo não suportado.", content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = RequestResponseDTO.class),
+                examples = @ExampleObject(value = "{\"message\": \"Tipo de Arquivo não suportado.\", \"status\": 415}")
             )),
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content(
                 mediaType = "application/json",
@@ -684,6 +694,11 @@ public class ConsultaController {
                 schema = @Schema(implementation = RequestResponseDTO.class),
                 examples = @ExampleObject(value = "{\"message\": \"Consulta não encontrada.\", \"status\": 404}")
             )),
+            @ApiResponse(responseCode = "415", description = "Tipo de Arquivo não suportado.", content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = RequestResponseDTO.class),
+                examples = @ExampleObject(value = "{\"message\": \"Tipo de Arquivo não suportado.\", \"status\": 415}")
+            )),
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content(
                 mediaType = "application/json",
                 schema = @Schema(implementation = RequestResponseDTO.class),
@@ -725,6 +740,11 @@ public class ConsultaController {
                 mediaType = "application/json",
                 schema = @Schema(implementation = RequestResponseDTO.class),
                 examples = @ExampleObject(value = "{\"message\": \"Consulta não encontrada.\", \"status\": 404}")
+            )),
+            @ApiResponse(responseCode = "415", description = "Tipo de Arquivo não suportado.", content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = RequestResponseDTO.class),
+                examples = @ExampleObject(value = "{\"message\": \"Tipo de Arquivo não suportado.\", \"status\": 415}")
             )),
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content(
                 mediaType = "application/json",
@@ -885,6 +905,11 @@ public class ConsultaController {
                 schema = @Schema(implementation = RequestResponseDTO.class),
                 examples = @ExampleObject(value = "{\"message\": \"Consulta não encontrada.\", \"status\": 404}")
             )),
+            @ApiResponse(responseCode = "415", description = "Tipo de Arquivo não suportado.", content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = RequestResponseDTO.class),
+                examples = @ExampleObject(value = "{\"message\": \"Tipo de Arquivo não suportado.\", \"status\": 415}")
+            )),
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content(
                 mediaType = "application/json",
                 schema = @Schema(implementation = RequestResponseDTO.class),
@@ -968,6 +993,11 @@ public class ConsultaController {
                 mediaType = "application/json",
                 schema = @Schema(implementation = RequestResponseDTO.class),
                 examples = @ExampleObject(value = "{\"message\": \"Consulta não encontrada.\", \"status\": 404}")
+            )),
+            @ApiResponse(responseCode = "415", description = "Tipo de Arquivo não suportado.", content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = RequestResponseDTO.class),
+                examples = @ExampleObject(value = "{\"message\": \"Tipo de Arquivo não suportado.\", \"status\": 415}")
             )),
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content(
                 mediaType = "application/json",

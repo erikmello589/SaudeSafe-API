@@ -47,13 +47,13 @@ public class AtestadoService {
             // Limitar tamanho do arquivo a 10 MB (10 * 1024 * 1024 bytes)
             long maxFileSize = 10 * 1024 * 1024; // 10 MB
             if (file.getSize() > maxFileSize) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Arquivo excede o tamanho máximo.");
+                throw new ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Arquivo excede o tamanho máximo.");
             }
 
             // Validar tipo do arquivo
             String contentType = file.getContentType();
             if (!isValidFileType(contentType)) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tipo de Arquivo não suportado.");
+                throw new ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Tipo de Arquivo não suportado.");
             }
 
             // Converter arquivo para byte[] e salvar no Atestado
@@ -94,13 +94,13 @@ public class AtestadoService {
             // Limitar tamanho do arquivo a 10 MB (10 * 1024 * 1024 bytes)
             long maxFileSize = 10 * 1024 * 1024; // 10 MB
             if (file.getSize() > maxFileSize) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Arquivo excede o tamanho máximo.");
+                throw new ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Arquivo excede o tamanho máximo.");
             }
 
             // Validar tipo do arquivo
             String contentType = file.getContentType();
             if (!isValidFileType(contentType)) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tipo de Arquivo não suportado.");
+                throw new ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Tipo de Arquivo não suportado.");
             }
 
             // Converter arquivo para byte[] e salvar no Atestado
