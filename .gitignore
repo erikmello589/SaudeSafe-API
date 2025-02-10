@@ -36,4 +36,3 @@ src/main/resources/app.key
 src/main/resources/app.pub
 
 src/main/resources/.env
-src/main/resources/application.properties
