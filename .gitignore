@@ -34,4 +34,6 @@ build/
 
 src/main/resources/app.key
 src/main/resources/app.pub
+src/main/resources/public.pem
+src/main/resources/private.pem
 .env
