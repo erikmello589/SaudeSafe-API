@@ -3,7 +3,6 @@ package com.faeterj.tcc.security;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -29,21 +28,25 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Value("${jwt.public.key}")
-    private RSAPublicKey publicKey;
+    @Bean
+    public RSAPublicKey publicKey() throws Exception {
+        return (RSAPublicKey) KeyLoader.loadPublicKey();
+    }
 
-    @Value("${jwt.private.key}")
-    private RSAPrivateKey privateKey;
+    @Bean
+    public RSAPrivateKey privateKey() throws Exception {
+        return (RSAPrivateKey) KeyLoader.loadPrivateKey();
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers(HttpMethod.POST,  "/login").permitAll()
-            .requestMatchers(HttpMethod.POST,  "/cadastrar").permitAll()
-            .requestMatchers(HttpMethod.POST,  "/esqueci-minha-senha").permitAll()
-            .requestMatchers(HttpMethod.POST,  "/redefinicao-senha").permitAll()
-            .requestMatchers(HttpMethod.GET,  "/profissional").permitAll()
+            .requestMatchers(HttpMethod.POST, "/login").permitAll()
+            .requestMatchers(HttpMethod.POST, "/cadastrar").permitAll()
+            .requestMatchers(HttpMethod.POST, "/esqueci-minha-senha").permitAll()
+            .requestMatchers(HttpMethod.POST, "/redefinicao-senha").permitAll()
+            .requestMatchers(HttpMethod.GET, "/profissional").permitAll()
             .requestMatchers(HttpMethod.GET, "/profissional/{id}").permitAll()
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html").permitAll()
             .anyRequest().authenticated())
@@ -55,22 +58,19 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtDecoder jwtDecoder()
-    {
+    public JwtDecoder jwtDecoder(RSAPublicKey publicKey) {
         return NimbusJwtDecoder.withPublicKey(publicKey).build();
     }
 
     @Bean
-    public JwtEncoder jwtEncoder()
-    {
-        JWK jwk = new RSAKey.Builder(this.publicKey).privateKey(privateKey).build();
+    public JwtEncoder jwtEncoder(RSAPublicKey publicKey, RSAPrivateKey privateKey) {
+        JWK jwk = new RSAKey.Builder(publicKey).privateKey(privateKey).build();
         var jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
         return new NimbusJwtEncoder(jwks);
     }
 
     @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder()
-    {
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }
