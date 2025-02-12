@@ -44,6 +44,9 @@ O Banco de Dados possui como principais tabelas:
 - **Estabelecimento de Saúde**: Armazena as informações de um ambiente de atendimento, como o endereço e o CEP.
 - **Consultas**: Guarda informações de uma consulta, que conecta um paciente, um médico e um estabelecimento de saúde.
 
+  ![Modelo Lógico V1 - 5TFC (1)](https://github.com/user-attachments/assets/b8d6555a-16f3-45b9-8b9f-ddab3ffae97c)
+
+
 ## 💪 Dependências Principais
 
 O projeto foi desenvolvido com as seguintes dependências principais:
