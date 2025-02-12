@@ -1,3 +1,5 @@
+![ERIK](https://github.com/user-attachments/assets/e33f6c1d-c62f-46db-9e5f-14fd1ff43408)
+
 # SaudeSafe - API RestFul
 
 ## Aplicação com foco em Facilidade, Segurança e Organização de Documentação Médica.
