@@ -51,14 +51,14 @@ public class PasswordResetService {
         tokenRepository.save(resetToken);
 
         // Enviar e-mail
-        String resetUrl = "http://localhost:8080/redefinicao-senha?token=" + token;
+        String resetUrl = "https://fivetfc-api.onrender.com/redefinicao-senha?token=" + token;
         sendEmail(user.getEmail(), resetUrl);
     }
 
     private void sendEmail(String to, String resetUrl) 
     {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("noreply5TFC@gmail.com");
+        message.setFrom("saudesafeapp@gmail.com");
         message.setTo(to);
         message.setSubject("Redefinição de Senha");
         message.setText("Para redefinir sua senha, clique no link:\n\n " + resetUrl);
