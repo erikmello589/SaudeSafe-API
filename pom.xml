@@ -8,9 +8,9 @@
 		<version>3.3.5</version>
 	</parent>
 	<groupId>com.faeterj</groupId>
-	<artifactId>tcc</artifactId>
+	<artifactId>saudesafe</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>tcc</name>
+	<name>saudesafe</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
