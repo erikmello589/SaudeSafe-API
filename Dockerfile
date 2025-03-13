@@ -1,16 +1,9 @@
-FROM ubuntu:latest AS build
+#Construindo imagem para a aplicação (Spring Boot)
 
-RUN apt-get update
-RUN apt-get install openjdk-17-jdk -y
-COPY . .
+FROM openjdk
 
-RUN apt-get install maven -y
-RUN mvn clean install -DskipTests
+WORKDIR /saudesafeapp
 
-FROM openjdk:17-jdk-slim
+COPY target/tcc-0.0.1-SNAPSHOT.jar /saudesafeapp/saudesafespring-app.jar 
 
-EXPOSE 8080
-
-COPY --from=build /target/tcc-0.0.1-SNAPSHOT.jar app.jar
-
-ENTRYPOINT [ "java", "-jar", "app.jar" ]
+ENTRYPOINT [ "java", "-jar", "saudesafespring-app.jar" ]
