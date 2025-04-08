@@ -47,7 +47,7 @@ public class TokenController {
             ))
         }
     )
-    @PostMapping("/login")
+    @PostMapping("/token/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
         try {
             LoginResponse response = tokenService.authenticate(loginRequest);
@@ -80,7 +80,7 @@ public class TokenController {
             ))
         }
     )
-    @PostMapping("/refresh-login")
+    @PostMapping("/token/refresh-login")
     public ResponseEntity<LoginResponse> refreshToken(JwtAuthenticationToken refreshTokenRecebido) {
         try {
             LoginResponse response = tokenService.refreshToken(refreshTokenRecebido);

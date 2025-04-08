@@ -382,10 +382,10 @@ public class ProfissionalSaudeController {
             ))
         }
     )
-    @PatchMapping("/statusProfissional/{idProfissional}")
+    @PatchMapping("/profissional/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     @SecurityRequirement(name = "Auth JWT")
-    public ResponseEntity<RequestResponseDTO> verificaProfissional(@PathVariable("idProfissional") Long idProfissional, @RequestBody statusRequisitadoDTO statusDTO, JwtAuthenticationToken token) 
+    public ResponseEntity<RequestResponseDTO> verificaProfissional(@PathVariable("id") Long idProfissional, @RequestBody statusRequisitadoDTO statusDTO, JwtAuthenticationToken token) 
     {
         try 
         {

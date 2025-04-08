@@ -63,7 +63,7 @@ public class UserController {
             ))
         }
     )
-    @PostMapping("/cadastrar")
+    @PostMapping("/user/cadastrar")
     public ResponseEntity<RequestResponseDTO> newUser(@RequestBody CreateUserDTO createUserDTO) {
         try {
             userService.registerNewUser(createUserDTO);
@@ -94,7 +94,7 @@ public class UserController {
             ))
         }
     )
-    @PostMapping("/redefinicao-senha")
+    @PostMapping("/user/redefinicao-senha")
     public ResponseEntity<RequestResponseDTO> resetPassword(@RequestBody RedefinicaoSenhaDTO redefinicaoSenhaDTO) {
         try {
             redefinicaoSenhaService.redefinirSenha(redefinicaoSenhaDTO);
@@ -125,7 +125,7 @@ public class UserController {
             ))
         }
     )
-    @PostMapping("/esqueci-minha-senha")
+    @PostMapping("/user/esqueci-minha-senha")
     public ResponseEntity<RequestResponseDTO> forgotPassword(@RequestBody EsqueciMinhaSenhaDTO esqueciMinhaSenhaDTO) 
     {
         try {
