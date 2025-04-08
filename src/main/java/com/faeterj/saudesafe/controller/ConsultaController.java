@@ -90,8 +90,8 @@ public class ConsultaController {
             ))
         }
     )
-    @PostMapping("/consulta/paciente/{idPaciente}")
-    public ResponseEntity<RequestResponseDTO> criarConsulta(@PathVariable("idPaciente") Long idPaciente, @RequestBody CreateConsultaDTO dto, JwtAuthenticationToken token) 
+    @PostMapping("/consulta/paciente/{id}")
+    public ResponseEntity<RequestResponseDTO> criarConsulta(@PathVariable("id") Long idPaciente, @RequestBody CreateConsultaDTO dto, JwtAuthenticationToken token) 
     {
         try 
         {
@@ -285,8 +285,8 @@ public class ConsultaController {
             ))
         }
     )
-    @GetMapping("/consulta/{consultaId}")
-    public ResponseEntity<?> buscaConsultaCompleta(@PathVariable("consultaId") Long consultaId,
+    @GetMapping("/consulta/{id}")
+    public ResponseEntity<?> buscaConsultaCompleta(@PathVariable("id") Long consultaId,
                                                     JwtAuthenticationToken token) 
     {
         try 
@@ -365,8 +365,8 @@ public class ConsultaController {
             ))
         }
     )
-    @GetMapping("/consultas/paciente/{pacienteId}")
-    public ResponseEntity<?> listaConsultasPaciente(@PathVariable("pacienteId") Long idPaciente, 
+    @GetMapping("/consultas/paciente/{id}")
+    public ResponseEntity<?> listaConsultasPaciente(@PathVariable("id") Long idPaciente, 
                                                     @RequestParam(value = "page", defaultValue = "0") int page, 
                                                     @RequestParam(value = "pageSize", defaultValue = "10") int pageSize, 
                                                     JwtAuthenticationToken token) 
@@ -495,9 +495,9 @@ public class ConsultaController {
             ))
         }
     )
-    @PostMapping("/atestado/consulta/{idConsulta}")
+    @PostMapping("/consulta/{id}/atestado")
     public ResponseEntity<RequestResponseDTO> criarAtestado(
-            @PathVariable("idConsulta") Long idConsulta, 
+            @PathVariable("id") Long idConsulta, 
             @RequestPart CreateAtestadoDTO dto,
             @RequestParam(value = "file", required = false) MultipartFile file,
             JwtAuthenticationToken token) throws IOException {
@@ -542,9 +542,9 @@ public class ConsultaController {
             ))
         }
     )
-    @PutMapping("/atestado/consulta/{idConsulta}")
+    @PutMapping("/consulta/{id}/atestado")
     public ResponseEntity<RequestResponseDTO> editarAtestado(
-            @PathVariable("idConsulta") Long idConsulta, 
+            @PathVariable("id") Long idConsulta, 
             @RequestPart CreateAtestadoDTO dto,
             @RequestParam(value = "file", required = false) MultipartFile file,
             JwtAuthenticationToken token) throws IOException {
@@ -584,8 +584,8 @@ public class ConsultaController {
             ))
         }
     )
-    @DeleteMapping("/atestado/consulta/{idConsulta}")
-    public ResponseEntity<RequestResponseDTO> excluirAtestado(@PathVariable("idConsulta") Long idConsulta, JwtAuthenticationToken token) 
+    @DeleteMapping("/consulta/{id}/atestado")
+    public ResponseEntity<RequestResponseDTO> excluirAtestado(@PathVariable("id") Long idConsulta, JwtAuthenticationToken token) 
     {
         try 
         {
@@ -621,8 +621,8 @@ public class ConsultaController {
             ))
         }
     )
-    @GetMapping("/atestado/anexo/consulta/{idConsulta}")
-    public ResponseEntity<?> buscarAnexoAtestado(@PathVariable("idConsulta") Long idConsulta, JwtAuthenticationToken token) 
+    @GetMapping("/consulta/{id}/atestado/anexo")
+    public ResponseEntity<?> buscarAnexoAtestado(@PathVariable("id") Long idConsulta, JwtAuthenticationToken token) 
     {
         try 
         {
@@ -661,8 +661,8 @@ public class ConsultaController {
             ))
         }
     )
-    @DeleteMapping("/atestado/anexo/consulta/{idConsulta}")
-    public ResponseEntity<RequestResponseDTO> excluirAnexoAtestado(@PathVariable("idConsulta") Long idConsulta, JwtAuthenticationToken token) 
+    @DeleteMapping("/consulta/{id}/atestado/anexo")
+    public ResponseEntity<RequestResponseDTO> excluirAnexoAtestado(@PathVariable("id") Long idConsulta, JwtAuthenticationToken token) 
     {
         try 
         {
@@ -706,9 +706,9 @@ public class ConsultaController {
             ))
         }
     )
-    @PostMapping("/receita/consulta/{idConsulta}")
+    @PostMapping("/consulta/{id}/receita")
     public ResponseEntity<RequestResponseDTO> criarReceita(
-            @PathVariable("idConsulta") Long idConsulta, 
+            @PathVariable("id") Long idConsulta, 
             @RequestPart CreateReceitaDTO dto,
             @RequestParam(value = "file", required = false) MultipartFile file,
             JwtAuthenticationToken token) throws IOException {
@@ -753,9 +753,9 @@ public class ConsultaController {
             ))
         }
     )
-    @PutMapping("/receita/consulta/{idConsulta}")
+    @PutMapping("/consulta/{id}/receita")
     public ResponseEntity<RequestResponseDTO> editarReceita(
-            @PathVariable("idConsulta") Long idConsulta, 
+            @PathVariable("id") Long idConsulta, 
             @RequestPart CreateReceitaDTO dto,
             @RequestParam(value = "file", required = false) MultipartFile file,
             JwtAuthenticationToken token) throws IOException {
@@ -795,8 +795,8 @@ public class ConsultaController {
             ))
         }
     )
-    @DeleteMapping("/receita/consulta/{idConsulta}")
-    public ResponseEntity<RequestResponseDTO> excluirReceita(@PathVariable("idConsulta") Long idConsulta, JwtAuthenticationToken token) 
+    @DeleteMapping("/consulta/{id}/receita")
+    public ResponseEntity<RequestResponseDTO> excluirReceita(@PathVariable("id") Long idConsulta, JwtAuthenticationToken token) 
     {
         try 
         {
@@ -832,8 +832,8 @@ public class ConsultaController {
             ))
         }
     )
-    @GetMapping("/receita/anexo/consulta/{idConsulta}")
-    public ResponseEntity<?> buscarAnexoReceita(@PathVariable("idConsulta") Long idConsulta, JwtAuthenticationToken token) 
+    @GetMapping("/consulta/{id}/receita/anexo")
+    public ResponseEntity<?> buscarAnexoReceita(@PathVariable("id") Long idConsulta, JwtAuthenticationToken token) 
     {
         try 
         {
@@ -872,8 +872,8 @@ public class ConsultaController {
             ))
         }
     )
-    @DeleteMapping("/receita/anexo/consulta/{idConsulta}")
-    public ResponseEntity<RequestResponseDTO> excluirAnexoReceita(@PathVariable("idConsulta") Long idConsulta, JwtAuthenticationToken token) 
+    @DeleteMapping("/consulta/{id}/receita/anexo")
+    public ResponseEntity<RequestResponseDTO> excluirAnexoReceita(@PathVariable("id") Long idConsulta, JwtAuthenticationToken token) 
     {
         try 
         {
@@ -917,9 +917,9 @@ public class ConsultaController {
             ))
         }
     )
-    @PostMapping("/pedidoExame/consulta/{idConsulta}")
+    @PostMapping("/consulta/{id}/pedidoExame")
     public ResponseEntity<RequestResponseDTO> criarPedidoExame(
-            @PathVariable("idConsulta") Long idConsulta, 
+            @PathVariable("id") Long idConsulta, 
             @RequestPart CreatePedidoExameDTO dto,
             @RequestParam(value = "file", required = false) MultipartFile file,
             JwtAuthenticationToken token) throws IOException {
@@ -959,9 +959,9 @@ public class ConsultaController {
             ))
         }
     )
-    @PutMapping("/pedidoExame/consulta/{idConsulta}")
+    @PutMapping("/consulta/{id}/pedidoExame")
     public ResponseEntity<RequestResponseDTO> editarReceita(
-            @PathVariable("idConsulta") Long idConsulta, 
+            @PathVariable("id") Long idConsulta, 
             @RequestPart CreatePedidoExameDTO dto,
             @RequestParam(value = "file", required = false) MultipartFile file,
             JwtAuthenticationToken token) throws IOException {
@@ -1006,8 +1006,8 @@ public class ConsultaController {
             ))
         }
     )
-    @DeleteMapping("/pedidoExame/consulta/{idConsulta}")
-    public ResponseEntity<RequestResponseDTO> excluirPedidoExame(@PathVariable("idConsulta") Long idConsulta, JwtAuthenticationToken token) 
+    @DeleteMapping("/consulta/{id}/pedidoExame")
+    public ResponseEntity<RequestResponseDTO> excluirPedidoExame(@PathVariable("id") Long idConsulta, JwtAuthenticationToken token) 
     {
         try 
         {
@@ -1043,8 +1043,8 @@ public class ConsultaController {
             ))
         }
     )
-    @GetMapping("/pedidoExame/anexo/consulta/{idConsulta}")
-    public ResponseEntity<?> buscarAnexoPedidoExame(@PathVariable("idConsulta") Long idConsulta, JwtAuthenticationToken token) 
+    @GetMapping("/consulta/{id}/pedidoExame/anexo")
+    public ResponseEntity<?> buscarAnexoPedidoExame(@PathVariable("id") Long idConsulta, JwtAuthenticationToken token) 
     {
         try 
         {
@@ -1083,8 +1083,8 @@ public class ConsultaController {
             ))
         }
     )
-    @DeleteMapping("/pedidoExame/anexo/consulta/{idConsulta}")
-    public ResponseEntity<RequestResponseDTO> excluirAnexoPedidoExame(@PathVariable("idConsulta") Long idConsulta, JwtAuthenticationToken token) 
+    @DeleteMapping("/consulta/{id}/pedidoExame/anexo")
+    public ResponseEntity<RequestResponseDTO> excluirAnexoPedidoExame(@PathVariable("id") Long idConsulta, JwtAuthenticationToken token) 
     {
         try 
         {
