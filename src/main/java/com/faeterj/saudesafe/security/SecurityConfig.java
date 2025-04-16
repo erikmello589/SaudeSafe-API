@@ -39,10 +39,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers(HttpMethod.POST,  "/login").permitAll()
-            .requestMatchers(HttpMethod.POST,  "/cadastrar").permitAll()
-            .requestMatchers(HttpMethod.POST,  "/esqueci-minha-senha").permitAll()
-            .requestMatchers(HttpMethod.POST,  "/redefinicao-senha").permitAll()
+            .requestMatchers(HttpMethod.POST,  "/token/login").permitAll()
+            .requestMatchers(HttpMethod.POST,  "/user/cadastrar").permitAll()
+            .requestMatchers(HttpMethod.POST,  "/user/esqueci-minha-senha").permitAll()
+            .requestMatchers(HttpMethod.POST,  "/user/redefinicao-senha").permitAll()
             .requestMatchers(HttpMethod.GET,  "/profissional").permitAll()
             .requestMatchers(HttpMethod.GET, "/profissional/{id}").permitAll()
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html").permitAll()

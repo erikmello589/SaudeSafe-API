@@ -1,9 +1,19 @@
 #Construindo imagem para a aplicação (Spring Boot)
 
-FROM openjdk
+FROM ubuntu:latest AS build
 
-WORKDIR /saudesafeapp
+RUN apt-get update
+RUN apt-get install openjdk-17-jdk -y
 
-COPY target/saudesafe-0.0.1-SNAPSHOT.jar /saudesafeapp/saudesafespring-app.jar 
+COPY . . 
+
+RUN apt-get install maven -y
+RUN mvn clean install
+
+FROM openjdk:17-jdk-slim
+
+EXPOSE 8080
+
+COPY  --from=build /target/saudesafe-0.0.1-SNAPSHOT.jar /saudesafeapp/saudesafespring-app.jar 
 
 ENTRYPOINT [ "java", "-jar", "saudesafespring-app.jar" ]
