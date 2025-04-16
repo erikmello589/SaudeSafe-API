@@ -14,6 +14,8 @@ FROM openjdk:17-jdk-slim
 
 EXPOSE 8080
 
+WORKDIR /saudesafeapp
+
 COPY  --from=build /target/saudesafe-0.0.1-SNAPSHOT.jar /saudesafeapp/saudesafespring-app.jar 
 
 ENTRYPOINT [ "java", "-jar", "saudesafespring-app.jar" ]
